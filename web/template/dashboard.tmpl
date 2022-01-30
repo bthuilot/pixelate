@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Pi Matrix</title>
+    </head>
+    <body>
+    <h1>
+        Dashboard
+    </h1>
+    <form method="post" action="/state" id="state-form">
+        <label for="state">Select Display</label>
+        <select name="state" id="state-select" form="state-form">
+            {{range $display_type := .StateTypes}}
+                <option value="{{$display_type}}">{{$display_type}}</option>
+            {{end}}
+        </select>
+        <input type="submit">
+
+        {{range $index, $config := index .AdditionalConfig .CurrentState}}
+            <label for="{{$config.Name}}">$config.FormattedName</label>
+            <input type="text" id="{{$config.Name}}" name="{{$config.Name}}" value="{{$config.Value}}"><br><br>
+        {{end}}
+    </form>
+    </body>
+</html>
