@@ -2,24 +2,31 @@
 <html lang="en">
     <head>
         <title>Pi Matrix</title>
+        <script src="/static/js/dashboard.js"></script>
     </head>
     <body>
     <h1>
         Dashboard
     </h1>
-    <form method="post" action="/state" id="state-form">
+    <form method="post" action="/state" id="state-form" onchange="">
         <label for="state">Select Display</label>
         <select name="state" id="state-select" form="state-form">
             {{range $display_type := .StateTypes}}
                 <option value="{{$display_type}}">{{$display_type}}</option>
             {{end}}
         </select>
-        <input type="submit">
+        <br>
+
+        <div id="additionalConfig">
+
+        </div>
 
         {{range $index, $config := index .AdditionalConfig .CurrentState}}
             <label for="{{$config.Name}}">$config.FormattedName</label>
             <input type="text" id="{{$config.Name}}" name="{{$config.Name}}" value="{{$config.Value}}"><br><br>
         {{end}}
+
+        <input type="submit">
     </form>
     </body>
 </html>

@@ -6,7 +6,7 @@ import (
 
 func GetCurrentAlbumArtURL() (string, bool) {
 	if client == nil {
-		Init()
+		//Init()
 	}
 	player, err := client.PlayerState(context.Background())
 

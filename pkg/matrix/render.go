@@ -2,19 +2,17 @@ package matrix
 
 import (
 	"SpotifyDash/pkg/image_util"
-	"SpotifyDash/pkg/spotify"
 	"fmt"
 	"log"
 )
 
-
 func RenderSpotify() {
-	url, playing := spotify.GetCurrentAlbumArtURL()
+	/*url, playing := spotify.GetCurrentAlbumArtURL()
 	if !playing {
 		RenderText("nothing currently playing")
 	} else {
-		RenderAlbum(url)
-	}
+		 RenderAlbum(url)
+	}*/
 }
 
 func RenderText(text string) {

@@ -16,6 +16,7 @@ var CurrentState = SpotifyAlbum
 func Init() {
 	http.HandleFunc("/", Dashboard)
 	http.HandleFunc("/state", UpdateState)
+	http.HandleFunc("/config/", ConfigSettings)
 	for {
 		switch CurrentState {
 		case SpotifyAlbum:
@@ -27,7 +28,6 @@ func Init() {
 	}
 	// TODO
 }
-
 
 func getWaitTime(state int) time.Duration {
 	switch state {
