@@ -1,4 +1,4 @@
-package server
+package api
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ func TextResponse(w http.ResponseWriter, body string, statusCode int) {
 func JsonResponse(w http.ResponseWriter, obj interface{}, statusCode int) {
 	jsonText, err := json.Marshal(obj)
 	if err != nil {
-		TextResponse(w, "server error", http.StatusInternalServerError)
+		TextResponse(w, "api error", http.StatusInternalServerError)
 	} else {
 		w.WriteHeader(statusCode)
 		_, _ = w.Write(jsonText)

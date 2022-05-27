@@ -1,7 +1,7 @@
 package matrix
 
 import (
-	"SpotifyDash/pkg/server"
+	"SpotifyDash/pkg/api"
 	"html/template"
 	"net/http"
 	"strings"
@@ -38,7 +38,7 @@ func UpdateState(w http.ResponseWriter, r *http.Request) {
 	case TickerStateValue:
 		CurrentState = Ticker
 	default:
-		server.TextResponse(w, "invalid state name", 404)
+		api.TextResponse(w, "invalid state name", 404)
 		return
 	}
 
@@ -49,7 +49,7 @@ func ConfigSettings(w http.ResponseWriter, r *http.Request) {
 	configPage := strings.TrimPrefix(r.URL.Path, "/config/")
 	config, err := getConfig(configPage)
 	if err != nil {
-		server.TextResponse(w, `invalid request`, http.StatusBadRequest)
+		api.TextResponse(w, `invalid request`, http.StatusBadRequest)
 	}
-	server.JsonResponse(w, config, http.StatusOK)
+	api.JsonResponse(w, config, http.StatusOK)
 }
