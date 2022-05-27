@@ -18,7 +18,7 @@ type Service struct {
 	matrix chan image.Image
 }
 
-func (s Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
+func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	auth := spotifyauth.New(
 		spotifyauth.WithRedirectURL(RedirectURL),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
@@ -60,36 +60,42 @@ func createCallback(clientChannel chan *spotify.Client, auth *spotifyauth.Authen
 		clientChannel <- client
 	}
 }
-func (s Service) Tick() {
+func (s *Service) Tick() error {
 	if s.client == nil {
-		return
+		return nil
 	}
+	fmt.Println("Ran")
 
-	player, _ := s.client.PlayerState(context.Background())
-
+	player, err := s.client.PlayerState(context.Background())
+	if err != nil {
+		return err
+	}
 	if !player.Playing {
-		return
+		return nil
 	}
 
 	images := player.Item.Album.Images
 
 	if len(images) > 0 {
+		fmt.Println("At images")
 		url := images[0].URL
 		img, err := image_util.FromURL(url)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		thumbnail := image_util.Resize(img)
+		fmt.Println("Writing")
 		s.matrix <- thumbnail
 	}
+	return nil
 }
 
-func (s Service) GetConfig() api.ConfigStore {
+func (s *Service) GetConfig() api.ConfigStore {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s Service) SetConfig(config api.ConfigStore) error {
+func (s *Service) SetConfig(config api.ConfigStore) error {
 	//TODO implement me
 	panic("implement me")
 	return nil

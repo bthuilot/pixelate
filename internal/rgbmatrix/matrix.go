@@ -36,7 +36,6 @@ package rgbmatrix
      o->inverse_colors = inverse_colors != 0 ? 1 : 0;
    }
 */
-
 import "C"
 import (
 	"SpotifyDash/internal/rgbemulator"

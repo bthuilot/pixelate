@@ -11,5 +11,5 @@ type Service interface {
 	GetConfig() ConfigStore
 	SetConfig(config ConfigStore) error
 	Init(matrixChan chan image.Image, engine *gin.Engine) error
-	Tick()
+	Tick() error
 }
