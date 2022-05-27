@@ -1,16 +1,15 @@
 package api
 
-const (
-	StringValue = iota
-	IntValue
-	FloatValue
+import (
+	"github.com/gin-gonic/gin"
+	"image"
 )
 
-type Config[T interface{}] struct {
-	value T
-}
+type ConfigStore map[string]interface{}
 
 type Service interface {
-	GetConfig() Config
-	SetConfig(config Config)
+	GetConfig() ConfigStore
+	SetConfig(config ConfigStore) error
+	Init(matrixChan chan image.Image, engine *gin.Engine) error
+	Tick()
 }

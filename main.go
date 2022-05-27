@@ -1,17 +1,39 @@
 package main
 
 import (
-	"SpotifyDash/pkg/matrix"
 	"SpotifyDash/pkg/api"
-	"SpotifyDash/pkg/types"
+	"SpotifyDash/pkg/matrix"
+	"SpotifyDash/pkg/spotify"
+	"github.com/gin-gonic/gin"
 )
 
-var services = [...]types.Service {
-	Spo
+func main() {
+	r := gin.Default()
+	services := CreateServices(r)
+
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	go func() {
+		for _, s := range services {
+			s.Tick()
+		}
+	}()
+	r.Run() // listen and serve on 0.0.0.0:8080
 }
 
-func main() {
-	api.Init()
-	// spotify.Init()
-	matrix.Init()
+func CreateServices(r *gin.Engine) []api.Service {
+	matrixService, _ := matrix.CreateService()
+	services := []api.Service{
+		spotify.Service{},
+	}
+	for _, service := range services {
+		err := service.Init(matrixService.Chan, r)
+		if err != nil {
+			panic(err)
+		}
+	}
+	return services
 }

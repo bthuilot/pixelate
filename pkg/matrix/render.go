@@ -1,9 +1,7 @@
 package matrix
 
 import (
-	"SpotifyDash/pkg/image_util"
 	"fmt"
-	"log"
 )
 
 func RenderSpotify() {
@@ -21,11 +19,5 @@ func RenderText(text string) {
 }
 
 func RenderAlbum(url string) {
-	img, err := image_util.FromURL(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	thumbnail := image_util.Resize(img)
-	fmt.Println(thumbnail.Bounds().String())
-	// TODO
+
 }
