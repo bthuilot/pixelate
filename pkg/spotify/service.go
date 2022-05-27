@@ -2,7 +2,7 @@ package spotify
 
 import (
 	"SpotifyDash/pkg/api"
-	"SpotifyDash/pkg/image_util"
+	"SpotifyDash/pkg/util"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -14,6 +14,9 @@ import (
 	"os"
 )
 
+const redirectURL = "http://matrix.thuilot.io:8080/spotify/callback"
+const state = "test!"
+
 type Service struct {
 	client *spotify.Client
 	matrix chan image.Image
@@ -21,7 +24,7 @@ type Service struct {
 
 func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	auth := spotifyauth.New(
-		spotifyauth.WithRedirectURL(RedirectURL),
+		spotifyauth.WithRedirectURL(redirectURL),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
 		spotifyauth.WithClientID(os.Args[1]),
 		spotifyauth.WithClientSecret(os.Args[2]),
@@ -29,7 +32,7 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	s.matrix = matrixChan
 
 	clientChan := make(chan *spotify.Client)
-	url := auth.AuthURL(State)
+	url := auth.AuthURL(state)
 
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 	engine.GET("/spotify/callback", createCallback(clientChan, auth))
@@ -45,15 +48,15 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 func createCallback(clientChannel chan *spotify.Client, auth *spotifyauth.Authenticator) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		r, w := context.Request, context.Writer
-		tok, err := auth.Token(context, State, r)
+		tok, err := auth.Token(context, state, r)
 		if err != nil {
 			context.AbortWithStatus(http.StatusForbidden)
 			log.Fatal(err)
 			return
 		}
-		if st := r.FormValue("state"); st != State {
+		if st := r.FormValue("state"); st != state {
 			context.AbortWithStatus(http.StatusNotFound)
-			log.Fatal(fmt.Errorf("state mismatch: %s != %s\n", st, State))
+			log.Fatal(fmt.Errorf("state mismatch: %s != %s\n", st, state))
 			return
 		}
 
@@ -82,11 +85,11 @@ func (s *Service) Tick() error {
 	if len(images) > 0 {
 		fmt.Println("At images")
 		url := images[0].URL
-		img, err := image_util.FromURL(url)
+		img, err := util.FromURL(url)
 		if err != nil {
 			return err
 		}
-		thumbnail := image_util.Resize(img)
+		thumbnail := util.Resize(img)
 		fmt.Println("Writing")
 		s.matrix <- thumbnail
 	}
