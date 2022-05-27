@@ -18,6 +18,7 @@ func CreateService() (*Service, error) {
 	config.Cols = 64
 	config.Rows = 64
 	config.HardwareMapping = "adafruit-hat"
+	config.Brightness = 50
 	// create a new Matrix instance with the DefaultConfig
 	m, err := rgbmatrix.NewRGBLedMatrix(config)
 	if err != nil {
