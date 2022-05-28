@@ -23,7 +23,7 @@ type TimeSeriesPoint struct {
 	Volume string `json:"5. volume"`
 }
 
-type GlobalQuoteResponse struct {
+type GlobalQuote struct {
 	Symbol        string `json:"01. symbol"`
 	Open          string `json:"02. open"`
 	High          string `json:"03. high"`
@@ -35,16 +35,23 @@ type GlobalQuoteResponse struct {
 	ChangePercent string `json:"10. change percent"`
 }
 
+type GlobalQuoteResponse struct {
+	Quote GlobalQuote `json:"Global Quote"`
+}
+
 type StockResponse struct {
 	MetaData   map[string]string          `json:"MetaData"`
 	TimeSeries map[string]TimeSeriesPoint `json:"Time Series (60min)"`
 }
 
-func getStockInfo(ticker string) (GlobalQuoteResponse, error) {
+func getStockInfo(ticker string) (quote GlobalQuote, err error) {
+	var response GlobalQuoteResponse
 	params := map[string]string{
 		"symbol":   ticker,
-		"apiKey":   apiKey,
+		"apikey":   apiKey,
 		"function": "GLOBAL_QUOTE",
 	}
-	return util.HTTPRequest[GlobalQuoteResponse](apiURL, params, nil, nil)
+	err = util.HTTPRequest[GlobalQuoteResponse](apiURL, params, nil, nil, &response)
+	quote = response.Quote
+	return
 }

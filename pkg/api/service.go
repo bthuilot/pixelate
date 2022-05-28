@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"image"
+	"time"
 )
 
 const (
@@ -23,4 +24,5 @@ type Service interface {
 	SetConfig(config ConfigStore) error
 	Init(matrixChan chan image.Image, engine *gin.Engine) error
 	Tick() error
+	RefreshDelay() time.Duration
 }

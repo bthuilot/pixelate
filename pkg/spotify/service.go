@@ -11,7 +11,7 @@ import (
 	"image"
 	"log"
 	"net/http"
-	"os"
+	"time"
 )
 
 const redirectURL = "http://matrix.thuilot.io:8080/spotify/callback"
@@ -26,8 +26,8 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	auth := spotifyauth.New(
 		spotifyauth.WithRedirectURL(redirectURL),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
-		spotifyauth.WithClientID(os.Args[1]),
-		spotifyauth.WithClientSecret(os.Args[2]),
+		//spotifyauth.WithClientID(os.Args[1]),
+		//spotifyauth.WithClientSecret(os.Args[2]),
 	)
 	s.matrix = matrixChan
 
@@ -105,4 +105,8 @@ func (s *Service) SetConfig(config api.ConfigStore) error {
 	//TODO implement me
 	panic("implement me")
 	return nil
+}
+
+func (s Service) RefreshDelay() time.Duration {
+	return time.Second * 5
 }

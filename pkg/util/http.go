@@ -10,7 +10,7 @@ import (
 )
 
 func HTTPRequest[T interface{}](baseURL string, params map[string]string,
-	headers map[string]string, body io.Reader) (T, error) {
+	headers map[string]string, body io.Reader, response *T) error {
 	client := &http.Client{}
 	queryParams := make([]string, len(params))
 	for key, val := range params {
@@ -25,14 +25,13 @@ func HTTPRequest[T interface{}](baseURL string, params map[string]string,
 		req.Header.Set(header, value)
 	}
 	if err != nil {
-		return nil, err
+		return err
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	decoder := json.NewDecoder(res.Body)
-	var response T
-	err = decoder.Decode(&response)
-	return response, err
+	err = decoder.Decode(response)
+	return err
 }

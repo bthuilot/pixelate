@@ -7,6 +7,7 @@ import (
 	"SpotifyDash/pkg/ticker"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"time"
 )
 
@@ -17,9 +18,9 @@ func main() {
 
 type Server struct {
 	selectedService api.Service
-
-	services []api.Service
-	router   *gin.Engine
+	matrix          *matrix.Service
+	services        []api.Service
+	router          *gin.Engine
 }
 
 func CreateServer() Server {
@@ -30,17 +31,23 @@ func CreateServer() Server {
 			"message": "pong",
 		})
 	})
-	s := createServices(r)
+	matrixService, err := matrix.CreateService()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	s := createServices(r, matrixService)
 	return Server{
 		selectedService: s[1],
 		services:        s,
 		router:          r,
+		matrix:          matrixService,
 	}
 }
 
 func (s Server) Run() {
 	go func() {
 		fmt.Println("Here")
+		sleep := time.Second * 30
 		for {
 			if s.selectedService != nil {
 				fmt.Println("tick")
@@ -48,23 +55,25 @@ func (s Server) Run() {
 				if err != nil {
 					fmt.Println(err)
 				}
+				sleep = s.selectedService.RefreshDelay()
+			} else {
+				s.matrix.ClearScreen()
 			}
-			time.Sleep(time.Second * 5)
+			time.Sleep(sleep)
 		}
 		fmt.Println("WHtt end")
 	}()
 	s.router.Run() // listen and serve on 0.0.0.0:8080
 }
 
-func createServices(r *gin.Engine) []api.Service {
-	matrixService, _ := matrix.CreateService()
-	matrixService.Init()
+func createServices(r *gin.Engine, matrix *matrix.Service) []api.Service {
+	matrix.Init()
 	services := []api.Service{
 		&spotify.Service{},
 		&ticker.Service{},
 	}
 	for _, service := range services {
-		err := service.Init(matrixService.Chan, r)
+		err := service.Init(matrix.Chan, r)
 		if err != nil {
 			panic(err)
 		}

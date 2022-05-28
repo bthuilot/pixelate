@@ -38,6 +38,10 @@ func CreateService() (*Service, error) {
 	}, nil
 }
 
+func (s *Service) ClearScreen() {
+	s.Matrix.Clear()
+}
+
 func (s *Service) Init() {
 	go func() {
 		defer s.Matrix.Close()
