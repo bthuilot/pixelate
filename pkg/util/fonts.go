@@ -1,9 +1,12 @@
 package util
 
-import "github.com/fogleman/gg"
+import (
+	"github.com/fogleman/gg"
+	"path"
+)
 
-const FontDir = "/home/bryce/github/PiMatrix/assets/fonts"
+var FontDir = path.Join(GetDir(), "assets/fonts")
 
-const BankPrinterFontPath = FontDir + "/F25_Bank_Printer.ttf"
+var BankPrinterFontPath = FontDir + "/F25_Bank_Printer.ttf"
 
 var ErrorFont, _ = gg.LoadFontFace(BankPrinterFontPath, 12)

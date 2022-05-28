@@ -2,8 +2,10 @@ package api
 
 import (
 	"SpotifyDash/internal/logging"
+	"SpotifyDash/pkg/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path"
 )
 
 func (s *Server) createEndpoints() {
@@ -15,7 +17,7 @@ func (s *Server) createEndpoints() {
 	})
 
 	// Dashboard & Web pages
-	s.router.Static("/static/", "/home/bryce/github/PiMatrix/web/assets")
+	s.router.Static("/static/", path.Join(util.GetDir(), "web/assets"))
 	s.router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", nil)
 	})
