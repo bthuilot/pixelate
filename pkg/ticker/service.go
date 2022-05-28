@@ -41,7 +41,6 @@ func (s *Service) Tick() (err error) {
 	if err != nil {
 		return err
 	}
-	fmt.Println(info)
 	img, err = createImg(s.stock, info.Change, info.Price[:len(info.Price)-2])
 	if err != nil {
 		return err

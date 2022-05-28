@@ -7,11 +7,18 @@ import (
 	"SpotifyDash/pkg/ticker"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"log"
 	"time"
 )
 
 func main() {
+
+	err := godotenv.Load("secrets.env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	server := CreateServer()
 	server.Run()
 }
