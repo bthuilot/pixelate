@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/disintegration/imaging"
+	"github.com/fogleman/gg"
 	"image"
+	"image/color"
 	"io"
 	"net/http"
 )
@@ -31,4 +33,13 @@ func FromURL(url string) (image.Image, error) {
 	}
 	img, _, err := image.Decode(response.Body)
 	return img, err
+}
+
+func RenderText(text string) image.Image {
+	dc := gg.NewContext(64, 64)
+	dc.DrawImage(&image.Uniform{C: color.Black}, 0, 0)
+	dc.SetFontFace(ErrorFont)
+	dc.SetColor(color.White)
+	dc.DrawStringWrapped(text, 32, 32, 0.5, 0.5, 64, 1.0, gg.AlignCenter)
+	return dc.Image()
 }

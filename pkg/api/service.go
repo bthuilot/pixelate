@@ -16,7 +16,7 @@ type ConfigValue struct {
 	configValue interface{}
 }
 
-type ConfigStore map[string]interface{}
+type ConfigStore map[string]string
 
 type Service interface {
 	// GetConfig is the retrieve the config for the
@@ -25,4 +25,5 @@ type Service interface {
 	Init(matrixChan chan image.Image, engine *gin.Engine) error
 	Tick() error
 	RefreshDelay() time.Duration
+	GetID() string
 }

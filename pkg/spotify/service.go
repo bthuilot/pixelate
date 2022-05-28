@@ -3,11 +3,11 @@ package spotify
 import (
 	"SpotifyDash/pkg/api"
 	"SpotifyDash/pkg/util"
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
+	"golang.org/x/exp/rand"
 	"image"
 	"log"
 	"net/http"
@@ -15,7 +15,8 @@ import (
 )
 
 const redirectURL = "http://matrix.thuilot.io:8080/spotify/callback"
-const state = "test!"
+
+var state = fmt.Sprintf("%d", rand.New(rand.NewSource(uint64(time.Now().UnixNano()))).Int63())
 
 type Service struct {
 	client *spotify.Client
@@ -33,6 +34,9 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	url := auth.AuthURL(state)
 
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
+	engine.GET("/spotify/login", func(c *gin.Context) {
+		c.Redirect(http.StatusTemporaryRedirect, url)
+	})
 	engine.GET("/spotify/callback", createCallback(clientChan, auth))
 	go func() {
 		select {
@@ -66,32 +70,16 @@ func createCallback(clientChannel chan *spotify.Client, auth *spotifyauth.Authen
 }
 func (s *Service) Tick() error {
 	if s.client == nil {
-		return nil
+		s.matrix <- util.RenderText("Must login")
+		return fmt.Errorf("please log into spotify")
 	}
-	fmt.Println("Ran")
-
-	player, err := s.client.PlayerState(context.Background())
+	img, err := s.RenderAlbumArt()
 	if err != nil {
-		return err
+		s.matrix <- util.RenderText("error")
+	} else {
+		s.matrix <- img
 	}
-	if !player.Playing {
-		return nil
-	}
-
-	images := player.Item.Album.Images
-
-	if len(images) > 0 {
-		fmt.Println("At images")
-		url := images[0].URL
-		img, err := util.FromURL(url)
-		if err != nil {
-			return err
-		}
-		thumbnail := util.Resize(img)
-		fmt.Println("Writing")
-		s.matrix <- thumbnail
-	}
-	return nil
+	return err
 }
 
 func (s *Service) GetConfig() api.ConfigStore {
@@ -105,6 +93,10 @@ func (s *Service) SetConfig(config api.ConfigStore) error {
 	return nil
 }
 
-func (s Service) RefreshDelay() time.Duration {
+func (s *Service) RefreshDelay() time.Duration {
 	return time.Second * 5
+}
+
+func (s *Service) GetID() string {
+	return "spotify"
 }

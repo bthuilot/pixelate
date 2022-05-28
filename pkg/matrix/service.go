@@ -1,8 +1,8 @@
 package matrix
 
 import (
+	"SpotifyDash/internal/logging"
 	"SpotifyDash/internal/rgbmatrix"
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -29,7 +29,7 @@ func CreateService() (*Service, error) {
 	c := rgbmatrix.NewCanvas(m)
 
 	// using the standard draw.Draw function we copy a white image onto the Canvas
-	draw.Draw(c, c.Bounds(), &image.Uniform{color.White}, image.ZP, draw.Src)
+	draw.Draw(c, c.Bounds(), &image.Uniform{C: color.White}, image.ZP, draw.Src)
 	// don't forget call Render to display the new led status
 	c.Render()
 	return &Service{
@@ -46,11 +46,10 @@ func (s *Service) Init() {
 	go func() {
 		defer s.Matrix.Close()
 		for {
-			fmt.Println("Checking")
+			logging.InfoLogger.Println("Polling for img")
 			select {
 			case drawImg := <-s.Chan:
-				fmt.Println("drawing")
-				fmt.Println(drawImg.At(32, 32))
+				logging.InfoLogger.Println("Image received, drawing")
 				draw.Draw(s.Matrix, s.Matrix.Bounds(), drawImg, image.Point{}, draw.Src)
 				s.Matrix.Render()
 			}

@@ -17,9 +17,10 @@ func HTTPRequest[T interface{}](baseURL string, params map[string]string,
 		param := fmt.Sprintf("%s=%s", url.QueryEscape(key), url.QueryEscape(val))
 		queryParams = append(queryParams, param)
 	}
+	fullURL := fmt.Sprintf("%s?%s", baseURL, strings.Join(queryParams, "&"))
 	req, err := http.NewRequest(
 		"GET",
-		fmt.Sprintf("%s?%s", baseURL, strings.Join(queryParams, "&")),
+		fullURL,
 		body)
 	for header, value := range headers {
 		req.Header.Set(header, value)
@@ -30,6 +31,9 @@ func HTTPRequest[T interface{}](baseURL string, params map[string]string,
 	res, err := client.Do(req)
 	if err != nil {
 		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("request to %s did not return 200", fullURL)
 	}
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(response)
