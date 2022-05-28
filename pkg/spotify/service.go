@@ -11,31 +11,35 @@ import (
 	"image"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
-
-const redirectURL = "http://matrix.thuilot.io:8080/spotify/callback"
 
 var state = fmt.Sprintf("%d", rand.New(rand.NewSource(uint64(time.Now().UnixNano()))).Int63())
 
 type Service struct {
 	client *spotify.Client
 	matrix chan image.Image
+	url    string
 }
 
 func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
+	baseURL := "localhost:8080"
+	if newBaseUrl := os.Getenv("SPOTIFY_CALLBACK_URL"); newBaseUrl != "" {
+		baseURL = newBaseUrl
+	}
 	auth := spotifyauth.New(
-		spotifyauth.WithRedirectURL(redirectURL),
+		spotifyauth.WithRedirectURL(fmt.Sprintf("http://%s/spotify/callback", baseURL)),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
 	)
 	s.matrix = matrixChan
 
 	clientChan := make(chan *spotify.Client)
-	url := auth.AuthURL(state)
+	s.url = auth.AuthURL(state)
 
-	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
+	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", s.url)
 	engine.GET("/spotify/login", func(c *gin.Context) {
-		c.Redirect(http.StatusTemporaryRedirect, url)
+		c.HTML(http.StatusOK, "spotify_login.tmpl", s.url)
 	})
 	engine.GET("/spotify/callback", createCallback(clientChan, auth))
 	go func() {
@@ -83,13 +87,10 @@ func (s *Service) Tick() error {
 }
 
 func (s *Service) GetConfig() api.ConfigStore {
-	//TODO implement me
-	panic("implement me")
+	return api.ConfigStore{}
 }
 
 func (s *Service) SetConfig(config api.ConfigStore) error {
-	//TODO implement me
-	panic("implement me")
 	return nil
 }
 

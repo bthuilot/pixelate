@@ -3,8 +3,10 @@ package api
 import (
 	"SpotifyDash/internal/logging"
 	"SpotifyDash/pkg/matrix"
+	"SpotifyDash/pkg/util"
 	"github.com/gin-gonic/gin"
 	"log"
+	"path"
 	"time"
 )
 
@@ -17,6 +19,7 @@ type Server struct {
 
 func CreateServer(allServices []Service) *Server {
 	r := gin.Default()
+	r.LoadHTMLGlob(path.Join(util.GetDir(), "web", "templates", "*", "*.tmpl"))
 	matrixService, err := matrix.CreateService()
 	if err != nil {
 		log.Fatalln(err)

@@ -12,17 +12,19 @@ import (
 func main() {
 
 	// Load env
-	err := godotenv.Load("secrets.env")
-	if err != nil {
+	if godotenv.Load("secrets.env") != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	// Load Logger
-	logging.Init()
+	if logging.Init() != nil {
+		log.Fatal("Unable to open loggers")
+	}
 
 	server := api.CreateServer([]api.Service{
 		&spotify.Service{},
 		&ticker.Service{},
 	})
+
 	server.Run()
 }

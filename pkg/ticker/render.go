@@ -10,7 +10,7 @@ import (
 
 var (
 	SymbolFont2, _ = gg.LoadFontFace(util.BankPrinterFontPath, 32)
-	SymbolFont4, _ = gg.LoadFontFace(util.BankPrinterFontPath, 26)
+	SymbolFont4, _ = gg.LoadFontFace(util.BankPrinterFontPath, 16)
 	ChangeFont, _  = gg.LoadFontFace(util.BankPrinterFontPath, 10)
 	PriceFont, _   = gg.LoadFontFace(util.BankPrinterFontPath, 15)
 )
