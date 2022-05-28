@@ -53,7 +53,7 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 
 func createCallback(clientChannel chan *spotify.Client, auth *spotifyauth.Authenticator) gin.HandlerFunc {
 	return func(context *gin.Context) {
-		r, w := context.Request, context.Writer
+		r := context.Request
 		tok, err := auth.Token(context, state, r)
 		if err != nil {
 			context.AbortWithStatus(http.StatusForbidden)
@@ -68,7 +68,7 @@ func createCallback(clientChannel chan *spotify.Client, auth *spotifyauth.Authen
 
 		// use the token to get an authenticated client
 		client := spotify.New(auth.Client(r.Context(), tok))
-		_, _ = fmt.Fprintf(w, "Login Completed!")
+		context.Redirect(http.StatusTemporaryRedirect, "/")
 		clientChannel <- client
 	}
 }
