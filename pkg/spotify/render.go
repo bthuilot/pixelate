@@ -30,5 +30,5 @@ func (s *Service) RenderAlbumArt() (img image.Image, err error) {
 		thumbnail := util.Resize(img)
 		return thumbnail, nil
 	}
-	return renderNotPlaying(), nil
+	return util.RenderText("Loading..."), nil
 }
