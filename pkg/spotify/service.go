@@ -26,8 +26,6 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	auth := spotifyauth.New(
 		spotifyauth.WithRedirectURL(redirectURL),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
-		//spotifyauth.WithClientID(os.Args[1]),
-		//spotifyauth.WithClientSecret(os.Args[2]),
 	)
 	s.matrix = matrixChan
 

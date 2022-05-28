@@ -7,8 +7,6 @@ import (
 
 const apiURL = "https://www.alphavantage.co/query"
 
-var apiKey = os.Getenv("ALPHA_VANTAGE_API_KEY")
-
 type StockInfo struct {
 	Ticker    string
 	Price     float64
@@ -48,7 +46,7 @@ func getStockInfo(ticker string) (quote GlobalQuote, err error) {
 	var response GlobalQuoteResponse
 	params := map[string]string{
 		"symbol":   ticker,
-		"apikey":   apiKey,
+		"apikey":   os.Getenv("ALPHA_VANTAGE_API_KEY"),
 		"function": "GLOBAL_QUOTE",
 	}
 	err = util.HTTPRequest[GlobalQuoteResponse](apiURL, params, nil, nil, &response)
