@@ -41,6 +41,17 @@ func (s *Service) Init(matrixChan chan image.Image, engine *gin.Engine) error {
 	engine.GET("/spotify/login", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "spotify_login.tmpl", s.url)
 	})
+	engine.GET("/spotify/generate", func(c *gin.Context) {
+		baseURL := "localhost:8080"
+		if newBaseUrl := os.Getenv("SPOTIFY_CALLBACK_URL"); newBaseUrl != "" {
+			baseURL = newBaseUrl
+		}
+		auth := spotifyauth.New(
+			spotifyauth.WithRedirectURL(fmt.Sprintf("http://%s/spotify/callback", baseURL)),
+			spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
+		)
+		s.url = auth.AuthURL(state)
+	})
 	engine.GET("/spotify/callback", createCallback(clientChan, auth))
 	go func() {
 		select {
