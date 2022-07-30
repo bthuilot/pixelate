@@ -28,5 +28,5 @@ func (s *Server) Run() {
 	s.createEndpoints()
 	logging.InfoLogger.Println("Spawning update loop")
 	logging.InfoLogger.Println("Starting router")
-	s.router.Run("matrix.thuilot.io:80") // listen and serve on localhost:80
+	s.router.Run("0.0.0.0:80") // listen and serve on localhost:80
 }
