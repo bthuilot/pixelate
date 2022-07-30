@@ -3,10 +3,21 @@ package api
 import (
 	"SpotifyDash/internal/logging"
 	"SpotifyDash/pkg/util"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"path"
+
+	"github.com/gin-gonic/gin"
 )
+
+type ValidResponse[T interface{}] struct {
+	Success  bool `json:"success"`
+	Response T    `json:"response"`
+}
+
+type InvalidResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
 
 func (s *Server) createEndpoints() {
 	logging.InfoLogger.Println("Creating endpoint")
@@ -16,114 +27,97 @@ func (s *Server) createEndpoints() {
 		})
 	})
 
-	// Dashboard & Web pages
-	s.router.Static("/static/", path.Join(util.GetDir(), "web/assets"))
+	s.router.Static("/static", path.Join(util.GetDir(), "web/assets"))
 	s.router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.tmpl", nil)
 	})
-	s.router.GET("/config/:service", s.RenderConfigPage())
-	// Services
+
+	// List all services
 	s.router.GET("/services", s.ListServices())
+
+	// Service
 	s.router.GET("/service", s.GetCurrentService())
 	s.router.POST("/service", s.SetService())
-	s.router.DELETE("/service", s.RemoveService())
+	s.router.DELETE("/service", s.StopCurrentService())
 
-	// View Specific Services
-	s.router.GET("/service/:service/config", s.GetServiceConfig())
-	s.router.POST("/service/:service/config", s.UpdateServiceConfig())
+	// Config
+	s.router.POST("/service/config", s.UpdateConfig())
+
+	// Setup
+	s.router.GET("/setup", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "setup.tmpl", s.cndtr)
+	})
 }
 
-func (s *Server) RenderConfigPage() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if serv, exists := s.services[c.Param("service")]; exists {
-			c.HTML(http.StatusOK, "config.tmpl", gin.H{"serviceName": serv.GetID()})
-		} else {
-			c.AbortWithStatus(http.StatusNotFound)
-		}
-	}
+type serviceResponse struct {
+	IsRunning bool              `json:"is_running"`
+	ID        string            `json:"id"`
+	Config    map[string]string `json:"config"`
 }
 
 func (s *Server) GetCurrentService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if serv := s.selectedService; serv != nil {
-			c.JSON(http.StatusOK, serv.GetID())
-		} else {
-			c.JSON(http.StatusOK, nil)
-		}
+		id, cfg, isRunning := s.cndtr.GetCurrentService()
+		c.JSON(http.StatusOK, ValidResponse[serviceResponse]{
+			Success: true,
+			Response: serviceResponse{
+				ID:        id,
+				Config:    cfg,
+				IsRunning: isRunning,
+			},
+		})
 	}
 }
 
-func (s *Server) RemoveService() gin.HandlerFunc {
+func (s *Server) StopCurrentService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		s.selectedService = nil
-		s.PerformTick()
-		c.Status(http.StatusOK)
+		s.cndtr.StopCurrentService()
 	}
 }
 
 func (s *Server) ListServices() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logging.InfoLogger.Println("Retrieving services")
-		var services []string
-		for _, service := range s.services {
-			services = append(services, service.GetID())
-		}
-		response := gin.H{"services": services, "selected": nil}
-		if s.selectedService != nil {
-			response["selected"] = s.selectedService.GetID()
-		}
-		c.JSON(200, response)
+		services := s.cndtr.ListServices()
+		c.JSON(200, ValidResponse[[]string]{
+			Success:  true,
+			Response: services,
+		})
 	}
 }
 
-type UpdateServiceRequest struct {
-	Service string `json:"service"`
+func (s *Server) UpdateConfig() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var cfg map[string]string
+		err := c.ShouldBindJSON(&cfg)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
+				Success: false,
+				Message: "invalid config, must be JSON object of string -> string",
+			})
+		}
+	}
 }
 
 func (s *Server) SetService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var body UpdateServiceRequest
-		err := c.ShouldBindJSON(&body)
+		var service string
+		err := c.ShouldBindJSON(&service)
 		if err != nil {
-			c.AbortWithStatus(http.StatusBadRequest)
+			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
+				Success: false,
+				Message: "invalid config, must be JSON object of string -> string",
+			})
 		}
-		value := body.Service
-		if service, exists := s.services[value]; exists {
-			logging.InfoLogger.Printf("Setting service to %s\n", value)
-			s.selectedService = service
-			_ = s.PerformTick()
-			c.Status(http.StatusOK)
-			return
+		err = s.cndtr.InitNewService(service)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
+				Success: false,
+				Message: "unable to start service",
+			})
 		}
-		logging.WarningLogger.Printf("Bad value given: %s", value)
-		c.AbortWithStatus(http.StatusBadRequest)
-	}
-}
-
-func (s *Server) GetServiceConfig() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		serviceName := c.Param("service")
-		if service, exist := s.services[serviceName]; exist {
-			c.JSON(http.StatusOK, service.GetConfig())
-		} else {
-			c.AbortWithStatus(http.StatusNotFound)
-		}
-	}
-}
-
-func (s *Server) UpdateServiceConfig() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		serviceName := c.Param("service")
-		var config ConfigStore
-		if err := c.ShouldBindJSON(&config); err != nil {
-			_ = c.AbortWithError(http.StatusBadRequest, err)
-			return
-		}
-		if service, exist := s.services[serviceName]; exist {
-			_ = service.SetConfig(config)
-			s.PerformTick()
-		} else {
-			c.AbortWithStatus(http.StatusNotFound)
-		}
+		c.JSON(http.StatusAccepted, ValidResponse[struct{}]{
+			Success: true,
+		})
 	}
 }

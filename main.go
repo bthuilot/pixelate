@@ -3,10 +3,12 @@ package main
 import (
 	"SpotifyDash/internal/logging"
 	"SpotifyDash/pkg/api"
-	"SpotifyDash/pkg/spotify"
-	"SpotifyDash/pkg/ticker"
-	"github.com/joho/godotenv"
+	"SpotifyDash/pkg/conductor"
+	"SpotifyDash/pkg/matrix"
+	"SpotifyDash/pkg/services"
 	"log"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -21,10 +23,15 @@ func main() {
 		log.Fatal("Unable to open loggers")
 	}
 
-	server := api.CreateServer([]api.Service{
-		&spotify.Service{},
-		&ticker.Service{},
-	})
+	svcs := []services.Service{
+		services.Spotify{},
+	}
+
+
+		log.Fatalln(err)
+	}
+	cndtr := conductor.SpawnConductor(matrixService, svcs)
+	server := api.CreateServer(cndtr)
 
 	server.Run()
 }
