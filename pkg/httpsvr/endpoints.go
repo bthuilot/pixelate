@@ -45,7 +45,16 @@ func (s *Server) createEndpoints() {
 
 	// Setup
 	s.router.GET("/setup", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "setup.tmpl", s.cndtr)
+		var htmlAttributes []string
+		setupPage, _ := s.cndtr.GetSetup()
+		for _, attr := range setupPage {
+			htmlAttributes = append(htmlAttributes, attr.GetHTML())
+		}
+		c.HTML(http.StatusOK, "setup.tmpl", struct {
+			ServiceConfigs []string
+		}{
+			ServiceConfigs: htmlAttributes,
+		})
 	})
 }
 
@@ -102,11 +111,11 @@ func (s *Server) UpdateConfig() gin.HandlerFunc {
 func (s *Server) SetService() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var service string
-		err := c.ShouldBindJSON(&service)
+		err := c.ShouldBind(&service)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
 				Success: false,
-				Message: "invalid config, must be JSON object of string -> string",
+				Message: "invalid service payload, must be string",
 			})
 		}
 		err = s.cndtr.InitNewService(service)

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+      <head>
+	<title>matrix setup</title>
+      </head>
+      <body>
+	<h2>Global Settings</h2>
+	<br/>
+	<h2>Service Settings</h2>
+	{{range _, $html := .ServiceConfigs}}
+	{{$html}}
+	<br/>
+	{{end}}
+      </body>
+</html>

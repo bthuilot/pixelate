@@ -12,6 +12,7 @@ type Conductor interface {
 	InitNewService(services.ID) error
 	GetCurrentService() (string, services.Config, bool)
 	UpdateConfig(services.Config) error
+	GetSetup() (services.SetupPage, bool)
 	StopCurrentService() error
 }
 
@@ -43,6 +44,12 @@ func SpawnConductor(mtrx *matrix.Service, svcs []services.Service) Conductor {
 		currentService: nil,
 		matrix:         mtrx,
 	}
+}
+
+func (c conductor) GetSetup() (setup services.SetupPage, running bool) {
+	setup = c.setup
+	running = c.currentService != nil
+	return
 }
 
 func (c conductor) ListServices() (result []services.ID) {

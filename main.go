@@ -25,6 +25,7 @@ func main() {
 
 	svcs := []services.Service{
 		services.Spotify{},
+		services.Ticker{},
 	}
 
 	matrixService, err := matrix.CreateService()
