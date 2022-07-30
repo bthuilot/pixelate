@@ -27,7 +27,8 @@ func main() {
 		services.Spotify{},
 	}
 
-
+	matrixService, err := matrix.CreateService()
+	if err != nil {
 		log.Fatalln(err)
 	}
 	cndtr := conductor.SpawnConductor(matrixService, svcs)
