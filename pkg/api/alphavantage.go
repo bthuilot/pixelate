@@ -1,4 +1,4 @@
-package ticker
+package api
 
 import (
 	"SpotifyDash/pkg/util"

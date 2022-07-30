@@ -1,4 +1,4 @@
-package api
+package httpsvr
 
 import (
 	"SpotifyDash/internal/logging"

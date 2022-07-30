@@ -2,8 +2,8 @@ package main
 
 import (
 	"SpotifyDash/internal/logging"
-	"SpotifyDash/pkg/api"
 	"SpotifyDash/pkg/conductor"
+	"SpotifyDash/pkg/httpsvr"
 	"SpotifyDash/pkg/matrix"
 	"SpotifyDash/pkg/services"
 	"log"
@@ -32,7 +32,7 @@ func main() {
 		log.Fatalln(err)
 	}
 	cndtr := conductor.SpawnConductor(matrixService, svcs)
-	server := api.CreateServer(cndtr)
+	server := httpsvr.CreateServer(cndtr)
 
 	server.Run()
 }

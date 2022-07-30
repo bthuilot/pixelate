@@ -109,7 +109,7 @@ func (s Spotify) tick() error {
 	if s.client == nil {
 		s.matrix <- util.RenderText("go to /setup to login")
 	}
-	img, err := s.RenderAlbumArt()
+	img, err := s.renderAlbumArt()
 	if err != nil {
 		s.matrix <- util.RenderText("error rendering album art")
 	} else {
@@ -122,7 +122,7 @@ func (s Spotify) GetTickInterval() time.Duration {
 	return time.Minute
 }
 
-func (s *Spotify) RenderAlbumArt() (img image.Image, err error) {
+func (s *Spotify) renderAlbumArt() (img image.Image, err error) {
 	player, err := s.client.PlayerState(context.Background())
 	if err != nil {
 		return nil, err

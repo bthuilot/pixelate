@@ -1,9 +1,10 @@
-package api
+package httpsvr
 
 import (
-	"github.com/gin-gonic/gin"
 	"image"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
