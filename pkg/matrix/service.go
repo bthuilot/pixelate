@@ -1,11 +1,12 @@
 package matrix
 
 import (
-	"SpotifyDash/internal/logging"
-	"SpotifyDash/internal/rgbmatrix"
 	"image"
 	"image/color"
 	"image/draw"
+
+	"github.com/bthuilot/pixelate/internal/logging"
+	"github.com/bthuilot/pixelate/internal/rgbmatrix"
 )
 
 type Service struct {

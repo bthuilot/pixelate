@@ -1,8 +1,9 @@
 package api
 
 import (
-	"SpotifyDash/pkg/util"
 	"os"
+
+	"github.com/bthuilot/pixelate/pkg/util"
 )
 
 const apiURL = "https://www.alphavantage.co/query"

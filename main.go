@@ -1,23 +1,16 @@
 package main
 
 import (
-	"SpotifyDash/internal/logging"
-	"SpotifyDash/pkg/conductor"
-	"SpotifyDash/pkg/httpsvr"
-	"SpotifyDash/pkg/matrix"
-	"SpotifyDash/pkg/services"
 	"log"
 
-	"github.com/joho/godotenv"
+	"github.com/bthuilot/pixelate/internal/logging"
+	"github.com/bthuilot/pixelate/pkg/conductor"
+	"github.com/bthuilot/pixelate/pkg/httpsvr"
+	"github.com/bthuilot/pixelate/pkg/matrix"
+	"github.com/bthuilot/pixelate/pkg/services"
 )
 
 func main() {
-
-	// Load env
-	if godotenv.Load("secrets.env") != nil {
-		log.Fatal("Error loading .env file")
-	}
-
 	// Load Logger
 	if logging.Init() != nil {
 		log.Fatal("Unable to open loggers")

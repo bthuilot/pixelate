@@ -1,7 +1,6 @@
 package services
 
 import (
-	"SpotifyDash/pkg/util"
 	"context"
 	"fmt"
 	"image"
@@ -10,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/bthuilot/pixelate/pkg/util"
 
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
@@ -55,7 +56,7 @@ func (s Spotify) GetDefaultConfig() Config {
 var state = fmt.Sprintf("%d", rand.New(rand.NewSource(time.Now().UnixNano())).Int63())
 
 func (s Spotify) Init(matrixChan chan image.Image) (page SetupPage) {
-	baseURL := "localhost:8080"
+	baseURL := "matrix.thuilot.io"
 	if newBaseUrl := os.Getenv("SPOTIFY_CALLBACK_URL"); newBaseUrl != "" {
 		baseURL = newBaseUrl
 	}

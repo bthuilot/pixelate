@@ -1,10 +1,12 @@
 package httpsvr
 
 import (
-	"SpotifyDash/internal/logging"
-	"SpotifyDash/pkg/util"
+	"io/ioutil"
 	"net/http"
 	"path"
+
+	"github.com/bthuilot/pixelate/internal/logging"
+	"github.com/bthuilot/pixelate/pkg/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -110,15 +112,14 @@ func (s *Server) UpdateConfig() gin.HandlerFunc {
 
 func (s *Server) SetService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var service string
-		err := c.ShouldBind(&service)
+		service, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
 				Success: false,
 				Message: "invalid service payload, must be string",
 			})
 		}
-		err = s.cndtr.InitNewService(service)
+		err = s.cndtr.InitNewService(string(service))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
 				Success: false,

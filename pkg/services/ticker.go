@@ -1,11 +1,12 @@
 package services
 
 import (
-	"SpotifyDash/pkg/util"
 	"image"
 	"image/color"
 	"math"
 	"time"
+
+	"github.com/bthuilot/pixelate/pkg/util"
 
 	"github.com/fogleman/gg"
 )

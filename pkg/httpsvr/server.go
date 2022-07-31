@@ -1,10 +1,11 @@
 package httpsvr
 
 import (
-	"SpotifyDash/internal/logging"
-	"SpotifyDash/pkg/conductor"
-	"SpotifyDash/pkg/util"
 	"path"
+
+	"github.com/bthuilot/pixelate/internal/logging"
+	"github.com/bthuilot/pixelate/pkg/conductor"
+	"github.com/bthuilot/pixelate/pkg/util"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,10 +1,11 @@
 package conductor
 
 import (
-	"SpotifyDash/pkg/matrix"
-	"SpotifyDash/pkg/services"
 	"fmt"
 	"log"
+
+	"github.com/bthuilot/pixelate/pkg/matrix"
+	"github.com/bthuilot/pixelate/pkg/services"
 )
 
 type Conductor interface {

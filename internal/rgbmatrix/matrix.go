@@ -38,11 +38,12 @@ package rgbmatrix
 */
 import "C"
 import (
-	"SpotifyDash/internal/rgbemulator"
 	"fmt"
 	"image/color"
 	"os"
 	"unsafe"
+
+	"github.com/bthuilot/pixelate/internal/rgbemulator"
 )
 
 // DefaultConfig default WS281x configuration
