@@ -1,6 +1,6 @@
 FROM golang:1.18-bullseye
 
-# RUN apt update && apt install gcc
+# RUN apt update && apt -y install xorg xxd libx11-dev
 
 WORKDIR /app
 
@@ -27,8 +27,13 @@ WORKDIR /app
 
 RUN go build -o /pixelate -v
 
-EXPOSE 8080 # WEb server
-EXPOSE 7000 # Spotify call back
+EXPOSE 6000
+# Web server
+EXPOSE 8080
+# Spotify call back
+EXPOSE 7000
+
+ENV MATRIX_EMULATOR=1
 
 CMD ["/pixelate"]
 

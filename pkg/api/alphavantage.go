@@ -6,14 +6,20 @@ import (
 	"github.com/bthuilot/pixelate/pkg/util"
 )
 
+// apiURL is the base URL for the Alpha Vantage api
 const apiURL = "https://www.alphavantage.co/query"
 
+// StockInfo represents the info about a stock ticker
 type StockInfo struct {
-	Ticker    string
-	Price     float64
+	// Ticker is the string of the ticker symbol
+	Ticker string
+	// Price is the current price of the stock
+	Price float64
+	// dayChange is how much much the price has changed curing the day
 	dayChange float64
 }
 
+//
 type TimeSeriesPoint struct {
 	Open   string `json:"1. open"`
 	High   string `json:"2. high"`

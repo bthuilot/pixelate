@@ -1,4 +1,4 @@
-package services
+package display
 
 import (
 	"image"
@@ -12,7 +12,6 @@ import (
 )
 
 type Ticker struct {
-	matrix chan image.Image
 	symbol string
 	// TODO api
 }
@@ -21,9 +20,7 @@ func (t Ticker) GetName() string {
 	return "Stock Ticker"
 }
 
-func (t Ticker) Run(_ Config) chan Command {
-	// TODO
-	cmdChannel := make(chan Command)
+func (t Ticker) Run(_ Config, cmdChannel chan Command, matrix chan image.Image) {
 	go func() {
 	exit_routine:
 		for {
@@ -34,7 +31,7 @@ func (t Ticker) Run(_ Config) chan Command {
 				case Stop:
 					break exit_routine
 				case Tick:
-					t.tick()
+					t.tick(matrix)
 				case Update:
 					// TODO get new ticker symbol
 				}
@@ -42,7 +39,6 @@ func (t Ticker) Run(_ Config) chan Command {
 		}
 
 	}()
-	return cmdChannel
 }
 
 func (t Ticker) GetDefaultConfig() Config {
@@ -51,25 +47,23 @@ func (t Ticker) GetDefaultConfig() Config {
 	}
 }
 
-func (t Ticker) Init(matrixChan chan image.Image) (page SetupPage) {
-	// TODO init API client
-	t.matrix = matrixChan
+func (t Ticker) Init(_ chan image.Image) (page SetupPage) {
 	return
 }
 
-func (t Ticker) tick() (err error) {
+func (t Ticker) tick(matrix chan image.Image) (err error) {
 	ticker := "BX"
 	if err != nil {
 		img := util.RenderText("Please set a ticker")
-		t.matrix <- img
+		matrix <- img
 		return err
 	}
 	if err != nil {
 		img := util.RenderText("API Error")
-		t.matrix <- img
+		matrix <- img
 		return err
 	}
-	t.matrix <- createImg(ticker, "-3", "100")
+	matrix <- createImg(ticker, "-3", "100")
 	return nil
 }
 

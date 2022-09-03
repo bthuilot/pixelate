@@ -1,4 +1,4 @@
-package services
+package display
 
 import (
 	"context"
@@ -21,24 +21,25 @@ type Spotify struct {
 	matrix chan image.Image
 }
 
+func NewSpotify() Spotify {
+	return Spotify{}
+}
+
 func (s Spotify) GetName() ID {
 	return "Spotify"
 }
 
-func (s Spotify) Run(_ Config) chan Command {
-	// TODO
-	cmdChannel := make(chan Command)
+func (s Spotify) Run(_ Config, cmdChan chan Command, matrixChan chan image.Image) {
 	go func() {
-	exit_routine:
 		for {
 			select {
-			case cmd := <-cmdChannel:
+			case cmd := <-cmdChan:
 				code := cmd.Code
 				switch code {
 				case Stop:
-					break exit_routine
+					return
 				case Tick:
-					s.tick()
+					s.tick(matrixChan)
 				case Update:
 					// No config so don't matter
 				}
@@ -46,7 +47,6 @@ func (s Spotify) Run(_ Config) chan Command {
 		}
 
 	}()
-	return cmdChannel
 }
 
 func (s Spotify) GetDefaultConfig() Config {
@@ -55,7 +55,7 @@ func (s Spotify) GetDefaultConfig() Config {
 
 var state = fmt.Sprintf("%d", rand.New(rand.NewSource(time.Now().UnixNano())).Int63())
 
-func (s Spotify) Init(matrixChan chan image.Image) (page SetupPage) {
+func (s Spotify) Init(_ chan image.Image) (page SetupPage) {
 	baseURL := "matrix.thuilot.io"
 	if newBaseUrl := os.Getenv("SPOTIFY_CALLBACK_URL"); newBaseUrl != "" {
 		baseURL = newBaseUrl
@@ -64,7 +64,6 @@ func (s Spotify) Init(matrixChan chan image.Image) (page SetupPage) {
 		spotifyauth.WithRedirectURL(fmt.Sprintf("http://%s/spotify/callback", baseURL)),
 		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
 	)
-	s.matrix = matrixChan
 	page = append(page, Button{
 		Link: auth.AuthURL(state),
 		Name: "Login with Spotify",
@@ -106,7 +105,7 @@ func (s Spotify) spotifyAuthCallback(auth *spotifyauth.Authenticator,
 	}
 }
 
-func (s Spotify) tick() error {
+func (s Spotify) tick(matrix chan image.Image) error {
 	if s.client == nil {
 		s.matrix <- util.RenderText("go to /setup to login")
 	}

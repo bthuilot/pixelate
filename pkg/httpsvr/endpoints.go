@@ -68,7 +68,7 @@ type serviceResponse struct {
 
 func (s *Server) GetCurrentService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id, cfg, isRunning := s.cndtr.GetCurrentService()
+		id, cfg, isRunning := s.cndtr.GetCurrentRenderer()
 		c.JSON(http.StatusOK, ValidResponse[serviceResponse]{
 			Success: true,
 			Response: serviceResponse{
@@ -82,14 +82,14 @@ func (s *Server) GetCurrentService() gin.HandlerFunc {
 
 func (s *Server) StopCurrentService() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		s.cndtr.StopCurrentService()
+		s.cndtr.StopCurrentRenderer()
 	}
 }
 
 func (s *Server) ListServices() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logging.InfoLogger.Println("Retrieving services")
-		services := s.cndtr.ListServices()
+		services := s.cndtr.ListRenders()
 		c.JSON(200, ValidResponse[[]string]{
 			Success:  true,
 			Response: services,
@@ -119,7 +119,7 @@ func (s *Server) SetService() gin.HandlerFunc {
 				Message: "invalid service payload, must be string",
 			})
 		}
-		err = s.cndtr.InitNewService(string(service))
+		err = s.cndtr.InitNewRenderer(string(service))
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
 				Success: false,
