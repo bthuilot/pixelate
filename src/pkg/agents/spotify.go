@@ -29,7 +29,10 @@ func (s *Spotify) SetConfig(config Config) error {
 func (s *Spotify) RegisterEndpoints(r *gin.Engine) {
 	s.authenticator = spotifyauth.New(
 		spotifyauth.WithRedirectURL(fmt.Sprintf("http://%s/spotify/callback", os.Getenv("MATRIX_SERVER_URL"))),
-		spotifyauth.WithScopes(spotifyauth.ScopeUserReadCurrentlyPlaying, spotifyauth.ScopeUserReadPlaybackState),
+		spotifyauth.WithScopes(
+			spotifyauth.ScopeUserReadCurrentlyPlaying,
+			spotifyauth.ScopeUserReadPlaybackState,
+			spotifyauth.ScopeUserReadEmail),
 	)
 	r.Any("/spotify/callback", s.authCallback)
 }
@@ -63,12 +66,24 @@ func (s *Spotify) GetConfig() Config {
 }
 
 func (s *Spotify) GetAdditionalHTML() []Attribute {
-	return []Attribute{
+	attrs := []Attribute{
 		Button{
 			Name: "Login with Spotify",
 			Link: s.authenticator.AuthURL(state),
 		},
 	}
+	if s.client != nil {
+		var content string
+		if usr, err := s.client.CurrentUser(context.Background()); err != nil {
+			content = "unable to retrieve user"
+		} else {
+			content = fmt.Sprintf("%s <%s>", usr.DisplayName, usr.Email)
+		}
+		attrs = append(attrs, Text{
+			Content: fmt.Sprintf("Currently logged in as: %s", content),
+		})
+	}
+	return attrs
 }
 
 func (s *Spotify) Render(img chan image.Image) {
