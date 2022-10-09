@@ -131,6 +131,7 @@ func (s Server) SetAgent(c *gin.Context) {
 			Success: false,
 			Message: "endpoint requires an agent name",
 		})
+		return
 	}
 	if err := s.cndtr.InitNewRenderer(request.Agent); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{

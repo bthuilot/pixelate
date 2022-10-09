@@ -28,5 +28,5 @@ func CreateServer(cndtr conductor.Conductor) (s *Server) {
 
 func (s Server) Run() {
 	logrus.Info("Starting HTTP Server")
-	s.router.Run("0.0.0.0:8080") // listen and serve on localhost:80
+	s.router.Run("0.0.0.0:8080") // listen and serve on localhost:8080
 }
