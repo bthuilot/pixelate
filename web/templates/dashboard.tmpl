@@ -1,32 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Pi Matrix</title>
-        <script src="/static/js/dashboard.js"></script>
-    </head>
-    <body>
-    <h1>
-        Dashboard
-    </h1>
-    <form method="post" action="/state" id="state-form" onchange="">
-        <label for="state">Select Display</label>
-        <select name="state" id="state-select" form="state-form">
-            {{range $display_type := .StateTypes}}
-                <option value="{{$display_type}}">{{$display_type}}</option>
-            {{end}}
-        </select>
-        <br>
+<head>
+    <title>πixelate</title>
+    <script src="/static/js/home.js"></script>
+</head>
+<body>
+<h1>
 
-        <div id="additionalConfig">
+</h1>
+<h3>Current Agent:</h3>
+{{if .CurrentAgentRunning}}
+    <p>{{.CurrentAgent}}</p>
+    <br/>
 
-        </div>
-
-        {{range $index, $config := index .AdditionalConfig .CurrentState}}
-            <label for="{{$config.Name}}">$config.FormattedName</label>
-            <input type="text" id="{{$config.Name}}" name="{{$config.Name}}" value="{{$config.Value}}"><br><br>
+    <form method="post" action="/agents/current/config" id="current-agent-form" onchange="">
+        {{range $name, $val := .Config }}
+             for="{{$name}}">{{$name}}</label>
+            <input type="text" id="{{$name}}" name="{{$name}}" value="{{$val}}"><br/><br/>
         {{end}}
-
-        <input type="submit">
     </form>
-    </body>
+         Attributes</b>
+        {{range $html := .Attributes}}
+            {{$html}}
+            <br/>
+        {{end}}
+{{else}}
+    <p>Nothing is running</p>
+{{end}}
+<hr/>
+
+<h3>Set new agent</h3>
+<form method="post" action="/agents/current" id="current-agent-form" onchange="">
+    <label for="agent">agent</label>
+    <select name="agent" id="agent" form="current-agent-form">
+        {{range $agent := .Agents}}
+            <option value="{{$agent}}">{{$agent}}</option>
+        {{end}}
+    </select>
+    <br/>
+    <input type="submit" name="Set new agent">
+</form>
+</body>
 </html>
