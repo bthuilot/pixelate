@@ -2,7 +2,7 @@ include secrets.env
 export
 
 pixelate:
-	cd src && go build main.go -o ../
+	cd src && go build -o ../pixelate main.go 
 
 .PHONY: debug test install
 debug:
