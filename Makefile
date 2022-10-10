@@ -1,14 +1,22 @@
-include secrets.env
-export
+SOURCEDIR = src
+# Go Sources
+GO_SOURCES = $(wildcard $(SOURCEDIR)/*.go)
+# Embded sources
+HTML_SOURCES = $(wildcard $(SOURCEDIR)/web/templates/*.tmpl)
+JS_SOURCES = $(wildcard $(SOURCEDIR)/web/static/js/*.js)
+CSS_SOURCES = $(wildcard $(SOURCEDIR)/web/static/css/*.css)
 
-pixelate:
-	cd src && go build -o ../pixelate main.go 
+pixelate: $(GO_SOURCES) $(HTML_SOURCES) $(JS_SOURCES) $(CSS_SOURCES) 
+	cd src && go build -o ../pixelate main.go && cd ..
 
-.PHONY: debug test install prod-vars release
+.PHONY: clean debug test install prod-vars release
+clean:
+	rm -f pixelate
+
 debug:
 	cd src && go run main.go
 
-install: pixelate
+install: src/pixelate
 	cp pixelate /usr/local/bin/pixelate
 
 test:
@@ -17,4 +25,4 @@ test:
 prod-vars:
 	export GIN_MODE=release
 
-release:
+release: clean prod-vars pixelate

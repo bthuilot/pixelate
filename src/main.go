@@ -3,17 +3,21 @@
 package main
 
 import (
-	"github.com/bthuilot/pixelate/pkg/agents"
-	"github.com/bthuilot/pixelate/pkg/conductor"
-	"github.com/bthuilot/pixelate/pkg/httpsvr"
-	"github.com/bthuilot/pixelate/pkg/matrix"
-	"github.com/sirupsen/logrus"
 	"log"
+
+	"github.com/bthuilot/pixelate/agents"
+	"github.com/bthuilot/pixelate/conductor"
+	"github.com/bthuilot/pixelate/matrix"
+	"github.com/bthuilot/pixelate/util"
+	"github.com/bthuilot/pixelate/web"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	// Load Logger
-
+	// Load viper
+	if err := util.InitConfig(); err != nil {
+		panic(err)
+	}
 	// Create services
 	logrus.Info("Creating renderers")
 	rndrs := []agents.Renderer{
@@ -26,10 +30,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	defer func() {
+		matrixService.ClearScreen()
+	}()
 	// Create the conductor
 	cndtr := conductor.SpawnConductor(matrixService, rndrs)
 
 	// Create and start webserver
-	server := httpsvr.CreateServer(cndtr)
+	server := web.CreateServer(cndtr)
 	server.Run()
 }
