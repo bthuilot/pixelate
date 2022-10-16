@@ -18,4 +18,8 @@ document.addEventListener('submit', (e) => {
     e.preventDefault();
 });
 
-console.log("hey!")
+console.log("hey!");
+
+function stopAgent() {
+    fetch("/agents/current", {method: "DELETE"}).then(window.location.reload).catch(alert("Could not stop server"))
+}

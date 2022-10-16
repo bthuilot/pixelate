@@ -1,4 +1,4 @@
-package agents
+package rendering
 
 import (
 	"context"
@@ -68,11 +68,11 @@ func (s *Spotify) GetConfig() Config {
 	return s.cfg
 }
 
-func (s *Spotify) GetAdditionalHTML() []Attribute {
-	attrs := []Attribute{
-		Button{
+func (s *Spotify) GetAdditionalConfig() []ConfigAttribute {
+	attrs := []ConfigAttribute{
+		Link{
 			Name: "Login with Spotify",
-			Link: s.authenticator.AuthURL(state),
+			Href: s.authenticator.AuthURL(state),
 		},
 	}
 	if s.client != nil {
@@ -100,7 +100,7 @@ func (s *Spotify) Render(img chan image.Image) {
 	}
 }
 
-func NewSpotify() Renderer {
+func NewSpotifyAgent() Agent {
 	return &Spotify{
 		authenticator: nil,
 		client:        nil,

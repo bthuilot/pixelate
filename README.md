@@ -1,6 +1,6 @@
 # πxelate
 
-*Note*: This project was insipired by [@rwardtech](https://www.tiktok.com/@rwardtech) on TikTok and his SpotiPi project which can be view [here on GitHUb](https://github.com/ryanwa18/spotipi).
+*Note*: This project was insipired by [@rwardtech](https://www.tiktok.com/@rwardtech) on TikTok and his SpotiPi project which can be view [here on GitHub](https://github.com/ryanwa18/spotipi).
 
 
 ## Hardware Needed

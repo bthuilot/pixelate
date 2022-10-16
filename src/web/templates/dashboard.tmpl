@@ -12,19 +12,21 @@
 {{if .CurrentAgentRunning}}
     <p>{{.CurrentAgent}}</p>
     <br/>
-
+    <br/>
+    <h4>Current Config</h4>
     <form method="post" action="/agents/current/config" id="current-agent-form" onchange="">
         {{range $name, $val := .Config }}
-             for="{{$name}}">{{$name}}</label>
+            <label for="{{$name}}">{{$name}}</label>
             <input type="text" id="{{$name}}" name="{{$name}}" value="{{$val}}"><br/><br/>
         {{end}}
     </form>
-         <br/>
-         <b>Attributes</b>
-        {{range $html := .Attributes}}
-            {{$html}}
-            <br/>
-        {{end}}
+    <br/>
+    <button onclick="stopAgent()">Stop Current Agent</button>
+    <b>Attributes</b>
+    {{range $html := .Attributes}}
+        {{$html}}
+        <br/>
+    {{end}}
 {{else}}
     <p>Nothing is running</p>
 {{end}}

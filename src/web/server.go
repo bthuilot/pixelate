@@ -14,7 +14,8 @@ type Server struct {
 	router *gin.Engine
 }
 
-func CreateServer(cndtr conductor.Conductor) (s *Server) {
+// NewServer will create a new HTTP Server
+func NewServer(cndtr conductor.Conductor) (s *Server) {
 	r := gin.Default()
 	s = &Server{
 		cndtr:  cndtr,
@@ -30,7 +31,7 @@ func CreateServer(cndtr conductor.Conductor) (s *Server) {
 	return
 }
 
-func (s Server) Run() {
+func (s Server) Run() error {
 	logrus.Info("Starting HTTP Server")
-	s.router.Run("0.0.0.0:8080") // listen and serve on localhost:8080
+	return s.router.Run("0.0.0.0:8080") // listen and serve on localhost:8080
 }

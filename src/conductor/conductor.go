@@ -8,8 +8,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/bthuilot/pixelate/agents"
 	"github.com/bthuilot/pixelate/matrix"
+	"github.com/bthuilot/pixelate/rendering"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -18,15 +18,15 @@ import (
 // renderers and matrix service.
 type Conductor interface {
 	// ListRenderer will return the IDs of all available renderers
-	ListRenderers() []agents.ID
+	ListRenderers() []rendering.ID
 	// InitNewRenderer will start a new renderer from its ID, and stop
 	// any existing renderer
-	InitNewRenderer(agents.ID) error
+	InitNewRenderer(rendering.ID) error
 	// GetCurrentRenderer will return the ID and config of the current renderer.
 	// It also will return a boolean, indicating if the there is a renderer currently running.
-	GetCurrentRenderer() (string, agents.Config, []agents.Attribute, bool)
+	GetCurrentRenderer() (string, rendering.Config, []rendering.ConfigAttribute, bool)
 	// UpdateConfig will update the config for the currently running renderer
-	UpdateConfig(agents.Config) error
+	UpdateConfig(rendering.Config) error
 	// StopCurrentRenderer will stop the currently running renderer
 	StopCurrentRenderer() error
 
@@ -36,8 +36,8 @@ type Conductor interface {
 // conductor is the concrete implementation of the Conductor interface.
 // This separation is done for testing purposes.
 type conductor struct {
-	// renderers is a mapping from Renderer ID to agents.Renderer
-	renderers map[string]agents.Renderer
+	// renderers is a mapping from Agent ID to rendering.Agent
+	renderers map[string]rendering.Agent
 	// matrix is a matrix.Service, which is responsible for controlling the matrix screen
 	matrix *matrix.Service
 	// currentRenderer is the currently displaying renderer
@@ -45,14 +45,14 @@ type conductor struct {
 }
 
 type currentAgent struct {
-	renderer agents.Renderer
+	renderer rendering.Agent
 	exitChan chan interface{}
 }
 
-// SpawnConductor will construct a conductor wit hthe given matrix service and list
+// New will construct a conductor wit hthe given matrix service and list
 // of available renderers. Will fail if the IDs of the Renderers are not unique.
-func SpawnConductor(mtrx *matrix.Service, rndrs []agents.Renderer) Conductor {
-	rndrMap := map[string]agents.Renderer{}
+func New(mtrx *matrix.Service, rndrs []rendering.Agent) Conductor {
+	rndrMap := map[string]rendering.Agent{}
 	for _, s := range rndrs {
 		name := s.GetName()
 		if _, e := rndrMap[name]; e {
@@ -76,7 +76,7 @@ func (c *conductor) RegisterAgentEndpoints(r *gin.Engine) {
 }
 
 // ListRenderers returns a list of all agents.IDs for all available renderers
-func (c *conductor) ListRenderers() (result []agents.ID) {
+func (c *conductor) ListRenderers() (result []rendering.ID) {
 	for n := range c.renderers {
 		result = append(result, n)
 	}
@@ -84,7 +84,7 @@ func (c *conductor) ListRenderers() (result []agents.ID) {
 }
 
 // InitNewRenderer will initialize a new renderer and stop any currently running
-func (c *conductor) InitNewRenderer(id agents.ID) error {
+func (c *conductor) InitNewRenderer(id rendering.ID) error {
 	logrus.Infof("starting rendering agent %s", id)
 	agent, exist := c.renderers[id]
 	if !exist {
@@ -97,7 +97,7 @@ func (c *conductor) InitNewRenderer(id agents.ID) error {
 	return nil
 }
 
-func (c *conductor) rendererLoop(agent agents.Renderer, exitChan chan interface{}) {
+func (c *conductor) rendererLoop(agent rendering.Agent, exitChan chan interface{}) {
 	logrus.Infof("beginning polling loop for %s", agent.GetName())
 	for {
 		select {
@@ -114,17 +114,17 @@ func (c *conductor) rendererLoop(agent agents.Renderer, exitChan chan interface{
 }
 
 // GetCurrentRenderer will return the currently running renderer
-func (c *conductor) GetCurrentRenderer() (id string, config agents.Config, attrs []agents.Attribute, isRunning bool) {
+func (c *conductor) GetCurrentRenderer() (id string, config rendering.Config, attrs []rendering.ConfigAttribute, isRunning bool) {
 	if isRunning = c.currentAgent != nil; isRunning {
 		id = c.currentAgent.renderer.GetName()
 		config = c.currentAgent.renderer.GetConfig()
-		attrs = c.currentAgent.renderer.GetAdditionalHTML()
+		attrs = c.currentAgent.renderer.GetAdditionalConfig()
 	}
 	return
 }
 
 // UpdateConfig will update the configuration for the currently runnnig renderer
-func (c *conductor) UpdateConfig(newCfg agents.Config) error {
+func (c *conductor) UpdateConfig(newCfg rendering.Config) error {
 	if c.currentAgent == nil {
 		return fmt.Errorf("no service running")
 	}

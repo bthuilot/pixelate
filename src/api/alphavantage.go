@@ -15,7 +15,7 @@ type StockInfo struct {
 	Ticker string
 	// Price is the current price of the stock
 	Price float64
-	// dayChange is how much much the price has changed curing the day
+	// dayChange is how much the price has changed curing the day
 	dayChange float64
 }
 
