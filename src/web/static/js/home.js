@@ -21,5 +21,7 @@ document.addEventListener('submit', (e) => {
 console.log("hey!");
 
 function stopAgent() {
-    fetch("/agents/current", {method: "DELETE"}).then(window.location.reload).catch(alert("Could not stop server"))
+    fetch("/agents/current", {
+        method: "DELETE"
+    }).then(() => window.location.reload()).catch(alert("Could not stop server"))
 }

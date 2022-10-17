@@ -5,10 +5,11 @@ package matrix
 
 import (
 	"fmt"
-	"github.com/bthuilot/pixelate/vndr/rgbmatrix"
 	"image"
 	"image/draw"
 	"time"
+
+	"github.com/bthuilot/pixelate/vndr/rgbmatrix"
 
 	"github.com/bthuilot/pixelate/rendering"
 	"github.com/gin-gonic/gin"
@@ -153,5 +154,6 @@ func (c *conductor) StopCurrentAgent() error {
 	}
 	c.currentAgent.exitChan <- struct{}{}
 	c.currentAgent = nil
+	c.display.Clear()
 	return nil
 }
