@@ -1,6 +1,9 @@
 package rendering
 
 import (
+	"fmt"
+	"github.com/bthuilot/pixelate/api"
+	"github.com/gin-gonic/gin"
 	"image"
 	"image/color"
 	"math"
@@ -10,65 +13,60 @@ import (
 )
 
 type Ticker struct {
-	symbol string
-	// TODO api
+	config Config
 }
 
-func (t Ticker) GetName() string {
-	return "Stock Ticker"
-}
+const tickerSymbolConfigName = "Ticker Symbol"
 
-//
-//func (t Ticker) Run(_ Config, cmdChannel chan Command, matrix chan image.Image) {
-//	go func() {
-//	exit_routine:
-//		for {
-//			select {
-//			case cmd := <-cmdChannel:
-//				code := cmd.Code
-//				switch code {
-//				case Stop:
-//					break exit_routine
-//				case Tick:
-//					t.tick(matrix)
-//				case Update:
-//					// TODO get new ticker symbol
-//				}
-//			}
-//		}
-//
-//	}()
-//}
-
-func (t Ticker) GetDefaultConfig() Config {
-	return Config{
-		"Ticker Symbol": "BX",
+func NewTickerAgent() Agent {
+	return &Ticker{
+		Config{
+			tickerSymbolConfigName: "BX",
+		},
 	}
 }
 
-//
-//func (t Ticker) Init(_ chan image.Image) (page SetupPage) {
-//	return
-//}
+const TickerAgentID ID = "Stock Ticker"
 
-func (t Ticker) tick(matrix chan image.Image) (err error) {
-	ticker := "BX"
-	if err != nil {
-		img := RenderText("Please set a ticker")
-		matrix <- img
-		return err
+func (t *Ticker) GetName() ID {
+	return TickerAgentID
+}
+
+func (t *Ticker) GetConfig() Config {
+	return t.config
+}
+
+func (t *Ticker) SetConfig(config Config) error {
+	if _, exist := config[tickerSymbolConfigName]; !exist {
+		return fmt.Errorf("invalid configuration, must contain '%s'", tickerSymbolConfigName)
 	}
-	if err != nil {
-		img := RenderText("API Error")
-		matrix <- img
-		return err
-	}
-	matrix <- createImg(ticker, "-3", "100")
+	t.config = config
 	return nil
 }
 
-func (t Ticker) GetTickInterval() time.Duration {
+func (t *Ticker) GetAdditionalConfig() (attrs []ConfigAttribute) {
+	return
+}
+
+func (t *Ticker) NextFrame() image.Image {
+	var ticker string
+	var exist bool
+	if ticker, exist = t.config[tickerSymbolConfigName]; !exist {
+		return RenderText("Please set a ticker")
+	}
+	res, err := api.GetStockInfo(ticker)
+	if err != nil {
+		return RenderText("API Error")
+	}
+	return createImg(ticker, res.Change, res.Price)
+}
+
+func (t *Ticker) GetTick() time.Duration {
 	return time.Minute * 10
+}
+
+func (t *Ticker) RegisterEndpoints(_ *gin.Engine) {
+	// No endpoints needed
 }
 
 /**************

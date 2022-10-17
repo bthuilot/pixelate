@@ -48,7 +48,7 @@ type StockResponse struct {
 	TimeSeries map[string]TimeSeriesPoint `json:"Time Series (60min)"`
 }
 
-func getStockInfo(ticker string) (quote GlobalQuote, err error) {
+func GetStockInfo(ticker string) (quote GlobalQuote, err error) {
 	var response GlobalQuoteResponse
 	params := map[string]string{
 		"symbol":   ticker,

@@ -18,6 +18,7 @@ func main() {
 	logrus.Info("Creating renderers")
 	rndrs := []rendering.Agent{
 		rendering.NewSpotifyAgent(),
+		rendering.NewTickerAgent(),
 	}
 
 	logrus.Info("Launching matrix service")
