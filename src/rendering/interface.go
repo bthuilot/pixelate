@@ -26,8 +26,8 @@ type Agent interface {
 	// GetAdditionalConfig will return a list of additional ConfigAttributes to display on the
 	// config page
 	GetAdditionalConfig() []ConfigAttribute
-	// Render will send an image to draw to the supplied channel
-	Render(chan image.Image)
+	// NextFrame will return the next image.Image to render to the display
+	NextFrame() image.Image
 	// GetTick will return the duration to sleep for between drawings
 	GetTick() time.Duration
 	// RegisterEndpoints will register agent specific endpoints to the HTTP Server

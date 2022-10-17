@@ -3,13 +3,9 @@
 package main
 
 import (
-	"log"
-
-	"github.com/bthuilot/pixelate/conductor"
 	"github.com/bthuilot/pixelate/matrix"
 	"github.com/bthuilot/pixelate/rendering"
 	"github.com/bthuilot/pixelate/util"
-	"github.com/bthuilot/pixelate/web"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,28 +21,21 @@ func main() {
 	}
 
 	logrus.Info("Launching matrix service")
-	// Create the matrix service
-	mtrx, err := matrix.New()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer func() {
-		mtrx.ClearScreen()
-	}()
 	// Create the conductor
-	cndtr := conductor.New(mtrx, rndrs)
+	logrus.Info("Creating conductor")
+	cndtr, err := matrix.NewConductor(rndrs)
+	if err != nil {
+		logrus.Error(err)
+	}
 
 	// Create and start webserver
-	server := web.NewServer(cndtr)
+	logrus.Info("Starting HTTP Server")
+	server := NewServer(cndtr)
 	if err := server.Run(); err != nil {
 		logrus.Error(err)
 	}
-	shutdown(mtrx, cndtr)
-}
-
-func shutdown(mtrx *matrix.Service, cndtr conductor.Conductor) {
-	if err := cndtr.StopCurrentRenderer(); err != nil {
+	logrus.Info("Server exited, shutting down agents")
+	if err := cndtr.StopCurrentAgent(); err != nil {
 		logrus.Error(err)
 	}
-	mtrx.Exit <- struct{}{}
 }

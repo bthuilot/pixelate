@@ -89,14 +89,14 @@ func (s *Spotify) GetAdditionalConfig() []ConfigAttribute {
 	return attrs
 }
 
-func (s *Spotify) Render(img chan image.Image) {
+func (s *Spotify) NextFrame() (img image.Image) {
 	if s.client == nil {
-		img <- util.RenderText("go to homepage to login")
+		return RenderText("go to homepage to login")
 	}
 	if albumArt, err := s.renderAlbumArt(); err != nil {
-		img <- util.RenderText("error rendering album art")
+		return RenderText("error rendering album art")
 	} else {
-		img <- albumArt
+		return albumArt
 	}
 }
 
@@ -116,25 +116,25 @@ var state = fmt.Sprintf("%d", rand.New(rand.NewSource(time.Now().UnixNano())).In
 
 func (s *Spotify) renderAlbumArt() (img image.Image, err error) {
 	if s.client == nil {
-		return util.RenderText("please sign in on homepage"), nil
+		return RenderText("please sign in on homepage"), nil
 	}
 	player, err := s.client.PlayerState(context.Background())
 	if err != nil {
 		return nil, err
 	}
 	if !player.Playing {
-		return util.RenderText("No songs playing"), nil
+		return RenderText("No songs playing"), nil
 	}
 
 	images := player.Item.Album.Images
 
 	if len(images) > 0 {
 		url := images[0].URL
-		img, err := util.FromURL(url)
+		img, err := FromURL(url)
 		if err != nil {
 			return nil, err
 		}
-		thumbnail := util.Resize(img)
+		thumbnail := Resize(img)
 		return thumbnail, nil
 	}
 	return nil, fmt.Errorf("no album art images returned from API")

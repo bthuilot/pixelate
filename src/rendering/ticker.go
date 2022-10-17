@@ -6,7 +6,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/bthuilot/pixelate/util"
 	"github.com/fogleman/gg"
 )
 
@@ -55,12 +54,12 @@ func (t Ticker) GetDefaultConfig() Config {
 func (t Ticker) tick(matrix chan image.Image) (err error) {
 	ticker := "BX"
 	if err != nil {
-		img := util.RenderText("Please set a ticker")
+		img := RenderText("Please set a ticker")
 		matrix <- img
 		return err
 	}
 	if err != nil {
-		img := util.RenderText("API Error")
+		img := RenderText("API Error")
 		matrix <- img
 		return err
 	}
@@ -82,10 +81,10 @@ var (
 )
 
 var (
-	symbolFont2, _ = gg.LoadFontFace(util.BankPrinterFontPath, 32)
-	symbolFont4, _ = gg.LoadFontFace(util.BankPrinterFontPath, 16)
-	changeFont, _  = gg.LoadFontFace(util.BankPrinterFontPath, 10)
-	priceFont, _   = gg.LoadFontFace(util.BankPrinterFontPath, 15)
+	symbolFont2, _ = gg.LoadFontFace(BankPrinterFontPath, 32)
+	symbolFont4, _ = gg.LoadFontFace(BankPrinterFontPath, 16)
+	changeFont, _  = gg.LoadFontFace(BankPrinterFontPath, 10)
+	priceFont, _   = gg.LoadFontFace(BankPrinterFontPath, 15)
 )
 
 func createImg(ticker string, change string, price string) image.Image {
@@ -132,7 +131,7 @@ func createImg(ticker string, change string, price string) image.Image {
 func renderError(msg string) image.Image {
 	dc := gg.NewContext(64, 64)
 	dc.DrawImage(&image.Uniform{C: color.Black}, 0, 0)
-	dc.SetFontFace(util.ErrorFont)
+	dc.SetFontFace(ErrorFont)
 	dc.SetColor(color.White)
 	dc.DrawStringWrapped(msg, 32, 32, 0.5, 0.5, 64, 1.0, gg.AlignCenter)
 	return dc.Image()
