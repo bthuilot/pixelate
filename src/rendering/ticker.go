@@ -81,10 +81,10 @@ var (
 )
 
 var (
-	symbolFont2, _ = gg.LoadFontFace(BankPrinterFontPath, 32)
-	symbolFont4, _ = gg.LoadFontFace(BankPrinterFontPath, 16)
-	changeFont, _  = gg.LoadFontFace(BankPrinterFontPath, 10)
-	priceFont, _   = gg.LoadFontFace(BankPrinterFontPath, 15)
+	symbolFont2, _ = LoadFont(BankPrinterFontName, 32)
+	symbolFont4, _ = LoadFont(BankPrinterFontName, 16)
+	changeFont, _  = LoadFont(BankPrinterFontName, 10)
+	priceFont, _   = LoadFont(BankPrinterFontName, 15)
 )
 
 func createImg(ticker string, change string, price string) image.Image {

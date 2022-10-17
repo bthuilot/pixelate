@@ -12,7 +12,9 @@ var fontFiles embed.FS
 
 const FontDir = "fonts"
 
-var ErrorFont, _ = LoadFont("F25_Bank_Printer.ttf", 12)
+const BankPrinterFontName = "F25_Bank_Printer.ttf"
+
+var ErrorFont, _ = LoadFont(BankPrinterFontName, 12)
 
 func LoadFont(name string, points float64) (font.Face, error) {
 	fontBytes, err := fontFiles.ReadFile(path.Join(FontDir, name))
