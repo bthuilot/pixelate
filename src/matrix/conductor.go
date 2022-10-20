@@ -110,21 +110,21 @@ func (c *conductor) InitNewAgent(id rendering.ID) error {
 // rendererLoop will begin a loop for continually drawing frames to the display
 func (c *conductor) rendererLoop(agent rendering.Agent, exitChan chan interface{}) {
 	logrus.Infof("beginning polling loop for %s", agent.GetName())
+	timer := time.NewTimer(agent.GetTick())
 	for {
 		select {
 		case <-exitChan:
 			logrus.Info("stopping agent %s\n", agent.GetName())
 			return
-		default:
+		case <-timer.C:
 			logrus.Debug("performing render tick")
 			frame := agent.NextFrame()
 			draw.Draw(c.display, c.display.Bounds(), frame, image.Point{}, draw.Src)
 			if err := c.display.Render(); err != nil {
 				logrus.Errorf("unable to render image: %s", err)
 			}
+			timer.Reset(agent.GetTick())
 		}
-		logrus.Debug("sleeping for %s", agent.GetTick())
-		time.Sleep(agent.GetTick())
 	}
 }
 
