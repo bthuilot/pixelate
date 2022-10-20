@@ -7,7 +7,7 @@ JS_SOURCES = $(wildcard $(SOURCEDIR)/web/static/js/*.js)
 CSS_SOURCES = $(wildcard $(SOURCEDIR)/web/static/css/*.css)
 
 pixelate: $(GO_SOURCES) $(HTML_SOURCES) $(JS_SOURCES) $(CSS_SOURCES) 
-	cd src && go build -o ../pixelate main.go && cd ..
+	cd src && go build -o ../pixelate && cd ..
 
 .PHONY: clean debug test install prod-vars release
 clean:
