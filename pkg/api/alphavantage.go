@@ -1,9 +1,8 @@
 package api
 
 import (
+	"github.com/bthuilot/pixelate/pkg/util"
 	"os"
-
-	"github.com/bthuilot/pixelate/util"
 )
 
 // apiURL is the base URL for the Alpha Vantage api

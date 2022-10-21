@@ -7,14 +7,16 @@ JS_SOURCES = $(wildcard $(SOURCEDIR)/web/static/js/*.js)
 CSS_SOURCES = $(wildcard $(SOURCEDIR)/web/static/css/*.css)
 
 pixelate: $(GO_SOURCES) $(HTML_SOURCES) $(JS_SOURCES) $(CSS_SOURCES) 
-	cd src && go build -o ../pixelate && cd ..
+	go build -o ../pixelate
 
 .PHONY: clean debug test install prod-vars release
 clean:
 	rm -f pixelate
 
+debug: export MATRIX_EMULATOR = 1
+
 debug:
-	cd src && go run main.go
+	go run main.go
 
 install: src/pixelate
 	cp pixelate /usr/local/bin/pixelate

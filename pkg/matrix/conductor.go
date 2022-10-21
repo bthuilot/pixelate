@@ -1,4 +1,4 @@
-// Package conductor contains all code for the Conductor interface, which is meant to server
+// Package matrix contains all code for the Conductor interface, which is meant to server
 // as a controller for starting, running and stopping renderers and the communication between
 // the display service and displaying agent
 package matrix
@@ -9,9 +9,9 @@ import (
 	"image/draw"
 	"time"
 
-	"github.com/bthuilot/pixelate/vndr/rgbmatrix"
+	"github.com/bthuilot/pixelate/third_party/rgbmatrix"
 
-	"github.com/bthuilot/pixelate/rendering"
+	"github.com/bthuilot/pixelate/pkg/rendering"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -111,20 +111,24 @@ func (c *conductor) InitNewAgent(id rendering.ID) error {
 func (c *conductor) rendererLoop(agent rendering.Agent, exitChan chan interface{}) {
 	logrus.Infof("beginning polling loop for %s", agent.GetName())
 	timer := time.NewTimer(agent.GetTick())
+	c.render(agent.NextFrame())
 	for {
 		select {
 		case <-exitChan:
-			logrus.Info("stopping agent %s\n", agent.GetName())
+			logrus.Infof("stopping agent %s\n", agent.GetName())
 			return
 		case <-timer.C:
 			logrus.Debug("performing render tick")
-			frame := agent.NextFrame()
-			draw.Draw(c.display, c.display.Bounds(), frame, image.Point{}, draw.Src)
-			if err := c.display.Render(); err != nil {
-				logrus.Errorf("unable to render image: %s", err)
-			}
+			c.render(agent.NextFrame())
 			timer.Reset(agent.GetTick())
 		}
+	}
+}
+
+func (c *conductor) render(img image.Image) {
+	draw.Draw(c.display, c.display.Bounds(), img, image.Point{}, draw.Src)
+	if err := c.display.Render(); err != nil {
+		logrus.Errorf("unable to render image: %s", err)
 	}
 }
 

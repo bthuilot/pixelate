@@ -23,5 +23,5 @@ console.log("hey!");
 function stopAgent() {
     fetch("/agents/current", {
         method: "DELETE"
-    }).then(() => window.location.reload()).catch(alert("Could not stop server"))
+    }).then(() => window.location.href=window.location.href).catch(err => console.log(err));
 }

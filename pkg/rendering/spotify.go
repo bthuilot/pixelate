@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bthuilot/pixelate/util"
+	"github.com/bthuilot/pixelate/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/zmb3/spotify/v2"

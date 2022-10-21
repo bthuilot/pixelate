@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title>πixelate</title>
-    <script src="/static/js/home.js"></script>
+    <script src="/static/index.js"></script>
 </head>
 <body>
 <h1>
@@ -21,7 +21,7 @@
         {{end}}
     </form>
     <br/>
-    <button onclick="stopAgent()">Stop Current Agent</button>
+    <button onClick="stopAgent().bind(window.location)">Stop Current Agent</button>
     <b>Attributes</b>
     {{range $html := .Attributes}}
         {{$html}}

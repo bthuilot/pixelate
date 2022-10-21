@@ -1,10 +1,8 @@
 package matrix
 
-import (
-	"github.com/bthuilot/pixelate/vndr/rgbmatrix"
-)
+import "github.com/bthuilot/pixelate/third_party/rgbmatrix"
 
-// New creates a n  ew Display that renders to the matrix display
+// New creates a new Display that renders to the matrix display
 func NewDisplayCanvas() (*rgbmatrix.Canvas, error) {
 	config := &rgbmatrix.DefaultConfig
 	config.Cols = 64

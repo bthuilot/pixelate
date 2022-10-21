@@ -2,7 +2,7 @@ package rendering
 
 import (
 	"fmt"
-	"github.com/bthuilot/pixelate/api"
+	"github.com/bthuilot/pixelate/pkg/api"
 	"github.com/gin-gonic/gin"
 	"image"
 	"image/color"
@@ -16,7 +16,7 @@ type Ticker struct {
 	config Config
 }
 
-const tickerSymbolConfigName = "Ticker Symbol"
+const tickerSymbolConfigName = "TickerSymbol"
 
 func NewTickerAgent() Agent {
 	return &Ticker{
@@ -26,7 +26,7 @@ func NewTickerAgent() Agent {
 	}
 }
 
-const TickerAgentID ID = "Stock Ticker"
+const TickerAgentID ID = "StockTicker"
 
 func (t *Ticker) GetName() ID {
 	return TickerAgentID
@@ -76,13 +76,6 @@ func (t *Ticker) RegisterEndpoints(_ *gin.Engine) {
 var (
 	positiveChange = color.RGBA{G: 255, A: 255}
 	negativeChange = color.RGBA{R: 255, A: 255}
-)
-
-var (
-	symbolFont2, _ = LoadFont(BankPrinterFontName, 32)
-	symbolFont4, _ = LoadFont(BankPrinterFontName, 16)
-	changeFont, _  = LoadFont(BankPrinterFontName, 10)
-	priceFont, _   = LoadFont(BankPrinterFontName, 15)
 )
 
 func createImg(ticker string, change string, price string) image.Image {

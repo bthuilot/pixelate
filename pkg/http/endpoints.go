@@ -1,77 +1,22 @@
-package main
+package http
 
 import (
-	"embed"
 	"fmt"
-	"github.com/bthuilot/pixelate/matrix"
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"html/template"
 	"io/fs"
 	"net/http"
-	"path"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/gin-gonic/gin"
 )
 
-//go:embed web/static/js/* web/static/css/*
-var staticFiles embed.FS
-
-//go:embed web/templates/*
-var templateFiles embed.FS
-
-// ValidResponse represents a 200 success response
-type ValidResponse[T interface{}] struct {
-	Success  bool `json:"success"`
-	Response T    `json:"response,omitempty"`
-}
-
-// InvalidResponse represents a failure from the server
-type InvalidResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-type Server struct {
-	cndtr  matrix.Conductor
-	router *gin.Engine
-}
-
-// NewServer will create a new HTTP Server
-func NewServer(cndtr matrix.Conductor) (s *Server) {
-	r := gin.Default()
-	s = &Server{
-		cndtr:  cndtr,
-		router: r,
-	}
-	html, err := template.ParseFS(templateFiles, "web/templates/*.tmpl")
-	if err != nil {
-		logrus.Fatalf("unable to read embded filesystem: %s", err)
-	}
-	r.SetHTMLTemplate(html)
-	s.registerEndpoints()
-	cndtr.RegisterAgentEndpoints(r)
-	return
-}
-
-// Run will start the HTTP server
-func (s Server) Run() error {
-	logrus.Info("Starting HTTP Server")
-	return s.router.Run("0.0.0.0:8080") // listen and serve on localhost:8080
-}
-
 // registerEndpoints will register all HTTP endpoints for the server
-func (s Server) registerEndpoints() {
+func (s Server) registerEndpoints(staticDir fs.FS) {
 	logrus.Info("registering HTTP endpoints")
 	s.router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status": "ok",
 		})
 	})
-	staticDir, err := fs.Sub(staticFiles, path.Join("web", "static"))
-	if err != nil {
-		panic("unable to traverse into static dir")
-	}
 	s.router.StaticFS("/static", http.FS(staticDir))
 	s.router.GET("/", s.RenderDashboard)
 
@@ -102,7 +47,7 @@ func (s Server) RenderDashboard(c *gin.Context) {
 	for _, attr := range attrs {
 		html = append(html, template.HTML(attr.GetHTML()))
 	}
-	c.HTML(http.StatusOK, "dashboard.tmpl", dashboard{
+	c.HTML(http.StatusOK, "index.tmpl", dashboard{
 		CurrentAgentRunning: running,
 		CurrentAgent:        name,
 		Config:              cfg,
@@ -139,8 +84,11 @@ func (s Server) StopCurrentAgent(c *gin.Context) {
 			Success: false,
 			Message: "No service is currently running",
 		})
+		return
 	}
-
+	c.JSON(http.StatusOK, ValidResponse[struct{}]{
+		Success: true,
+	})
 }
 
 // ListAgents will return a list of currently available rendering agents
@@ -179,10 +127,11 @@ type setAgentRequest struct {
 // SetAgent sets the current agent rendering to the display
 func (s Server) SetAgent(c *gin.Context) {
 	var request setAgentRequest
-	if c.ShouldBindJSON(&request) != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
+		logrus.Warningf("invalid set agent request: %s\n", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
 			Success: false,
-			Message: "endpoint requires an agent name",
+			Message: "endpoint requires an agent name:",
 		})
 		return
 	}
