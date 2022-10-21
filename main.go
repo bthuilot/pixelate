@@ -4,6 +4,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"github.com/bthuilot/pixelate/pkg/http"
 	"github.com/bthuilot/pixelate/pkg/matrix"
 	"github.com/bthuilot/pixelate/pkg/rendering"
@@ -14,21 +15,14 @@ import (
 	"path"
 )
 
-//go:embed assets/web/static/*
-var staticFilesEmbed embed.FS
-var staticFiles, _ = fs.Sub(staticFilesEmbed, path.Join("assets", "web", "static"))
-
-//go:embed assets/web/templates/*
-var templateFilesEmbed embed.FS
-var templateFiles, _ = fs.Sub(templateFilesEmbed, path.Join("assets", "web", "templates"))
-
-//go:embed assets/fonts/*
-var fontsEmbed embed.FS
-var fonts, _ = fs.Sub(fontsEmbed, path.Join("assets", "fonts"))
-
 func main() {
 	// Load viper
 	if err := util.InitConfig(); err != nil {
+		logrus.Fatal(err)
+	}
+
+	// Load Embedded Files
+	if err := initEmbed(); err != nil {
 		logrus.Fatal(err)
 	}
 	// Create services
@@ -40,8 +34,6 @@ func main() {
 	if err := rendering.LoadFonts(fonts); err != nil {
 		logrus.Fatal(err)
 	}
-
-	logrus.SetLevel(logrus.DebugLevel)
 
 	logrus.Info("Launching matrix service")
 	// Create the conductor
@@ -55,7 +47,7 @@ func main() {
 	logrus.Info("Starting HTTP Server")
 	server := http.NewServer(cndtr, http.Options{
 		Templates:   templateFiles,
-		StaticFiles: os.DirFS("assets/web/static/"),
+		StaticFiles: staticFiles,
 	})
 	if err = server.Run(); err != nil {
 		logrus.Fatal(err)
@@ -64,4 +56,43 @@ func main() {
 	if err = cndtr.StopCurrentAgent(); err != nil {
 		logrus.Fatal(err)
 	}
+}
+
+/* Embedded files */
+
+//go:embed assets/web/static/*
+var staticFilesEmbed embed.FS
+var staticFiles fs.FS
+
+//go:embed assets/web/templates/*
+var templateFilesEmbed embed.FS
+var templateFiles fs.FS
+
+//go:embed assets/fonts/*
+var fontsEmbed embed.FS
+var fonts fs.FS
+
+func initEmbed() (err error) {
+	// Fonts
+	fontDir := path.Join("assets", "fonts")
+	if os.Getenv("USE_FS") != "" {
+		fonts = os.DirFS(fontDir)
+	} else if fonts, err = fs.Sub(fontsEmbed, fontDir); err != nil {
+		return fmt.Errorf("unable to trasverse fonts directory: %s", err)
+	}
+
+	staticDir := path.Join("assets", "web", "static")
+	if os.Getenv("USE_FS") != "" {
+		staticFiles = os.DirFS(staticDir)
+	} else if staticFiles, err = fs.Sub(staticFilesEmbed, staticDir); err != nil {
+		return fmt.Errorf("unable to trasverse static files directory: %s", err)
+	}
+
+	templateDir := path.Join("assets", "web", "templates")
+	if os.Getenv("USE_FS") != "" {
+		templateFiles = os.DirFS(templateDir)
+	} else if templateFiles, err = fs.Sub(templateFilesEmbed, templateDir); err != nil {
+		return fmt.Errorf("unable to trasverse template files directory: %s", err)
+	}
+	return nil
 }
