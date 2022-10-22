@@ -31,15 +31,6 @@ func (s Server) registerEndpoints(staticDir fs.FS) {
 	s.router.POST("/agents/current/config", s.UpdateConfig)
 }
 
-// dashboard represents the struct to render the dashboard with
-type dashboard struct {
-	CurrentAgentRunning bool
-	CurrentAgent        string
-	Config              map[string]string
-	Attributes          []template.HTML
-	Agents              []string
-}
-
 // RenderDashboard is the endpoint to load and render the dashboard template
 func (s Server) RenderDashboard(c *gin.Context) {
 	name, cfg, attrs, running := s.cndtr.GetCurrentAgent()
@@ -47,7 +38,13 @@ func (s Server) RenderDashboard(c *gin.Context) {
 	for _, attr := range attrs {
 		html = append(html, template.HTML(attr.GetHTML()))
 	}
-	c.HTML(http.StatusOK, "index.tmpl", dashboard{
+	c.HTML(http.StatusOK, "index.tmpl", struct {
+		CurrentAgentRunning bool
+		CurrentAgent        string
+		Config              map[string]string
+		Attributes          []template.HTML
+		Agents              []string
+	}{
 		CurrentAgentRunning: running,
 		CurrentAgent:        name,
 		Config:              cfg,
@@ -56,20 +53,12 @@ func (s Server) RenderDashboard(c *gin.Context) {
 	})
 }
 
-// currentAgentResponse is the struct to represent the response from the HTTP server
-// for the currently running agent
-type currentAgentResponse struct {
-	IsRunning bool              `json:"is_running"`
-	ID        string            `json:"id"`
-	Config    map[string]string `json:"config"`
-}
-
 // GetCurrentAgent is the endpoint to return the currently running agent
 func (s Server) GetCurrentAgent(c *gin.Context) {
 	id, cfg, _, isRunning := s.cndtr.GetCurrentAgent()
-	c.JSON(http.StatusOK, ValidResponse[currentAgentResponse]{
+	c.JSON(http.StatusOK, ValidResponse[CurrentAgentResponse]{
 		Success: true,
-		Response: currentAgentResponse{
+		Response: CurrentAgentResponse{
 			ID:        id,
 			Config:    cfg,
 			IsRunning: isRunning,
@@ -119,14 +108,9 @@ func (s Server) UpdateConfig(c *gin.Context) {
 	}
 }
 
-// SetAgentRequest is a schema for a POST request to set the current agent
-type setAgentRequest struct {
-	Agent string `json:"agent"`
-}
-
 // SetAgent sets the current agent rendering to the display
 func (s Server) SetAgent(c *gin.Context) {
-	var request setAgentRequest
+	var request SetAgentRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
 		logrus.Warningf("invalid set agent request: %s\n", err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, InvalidResponse{
