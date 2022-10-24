@@ -54,7 +54,7 @@ func GetStockInfo(ticker string) (quote GlobalQuote, err error) {
 		"apikey":   os.Getenv("ALPHA_VANTAGE_API_KEY"),
 		"function": "GLOBAL_QUOTE",
 	}
-	err = util.HTTPRequest[GlobalQuoteResponse](apiURL, params, nil, nil, &response)
+	err = util.HTTPRequest[GlobalQuoteResponse]("GET", apiURL, params, nil, nil, &response)
 	quote = response.Quote
 	return
 }

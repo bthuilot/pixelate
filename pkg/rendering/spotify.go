@@ -3,6 +3,7 @@ package rendering
 import (
 	"context"
 	"fmt"
+	"github.com/disintegration/imaging"
 	"image"
 	"math/rand"
 	"net/http"
@@ -130,12 +131,8 @@ func (s *Spotify) renderAlbumArt() (img image.Image, err error) {
 
 	if len(images) > 0 {
 		url := images[0].URL
-		img, err := FromURL(url)
-		if err != nil {
-			return nil, err
-		}
-		thumbnail := Resize(img)
-		return thumbnail, nil
+		img, err := ImageFromURL(url)
+		return imaging.Resize(img, 64, 64, imaging.Lanczos), err
 	}
 	return nil, fmt.Errorf("no album art images returned from API")
 }

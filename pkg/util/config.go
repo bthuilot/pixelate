@@ -5,16 +5,19 @@ import (
 )
 
 const (
-	SpotifyClientID     = "spotify_client_id"
+	// SpotifyClientID is the name of the Viper config key for the Spotify API client ID
+	SpotifyClientID = "spotify_client_id"
+	// SpotifyClientSecret is the name of the Viper config key for the Spotify API client secret
 	SpotifyClientSecret = "spotify_client_secret"
-	ServerURL           = "server_url"
+	// ServerURL is the name of the Viper config key for the Server's URL
+	ServerURL = "server_url"
 )
 
+// InitConfig will initialize the viper configuration
 func InitConfig() error {
-	viper.SetConfigName("config")          // name of config file (without extension)
-	viper.SetConfigType("yaml")            // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath("/etc/pixelate/")  // path to look for the config file in
-	viper.AddConfigPath("$HOME/.pixelate") // call multiple times to add many search paths
-	viper.AddConfigPath(".")               // optionally look for config in the working directory
-	return viper.ReadInConfig()            // Find and read the config file
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("/etc/pixelate/")
+	viper.AddConfigPath(".")
+	return viper.ReadInConfig()
 }

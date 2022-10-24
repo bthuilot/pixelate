@@ -8,13 +8,19 @@ import (
 	"io/fs"
 )
 
+// Server is an HTTP server for providing an API for controlling the matrix
 type Server struct {
-	cndtr  matrix.Conductor
+	// cndtr is the matrix.Conductor for interfacing with agents and the display
+	cndtr matrix.Conductor
+	// router is the HTTP router
 	router *gin.Engine
 }
 
+// Options are options to provide
 type Options struct {
-	Templates   fs.FS
+	// Templates is a file system to read Go templates from
+	Templates fs.FS
+	// StaticFiles is the file system to read static files from
 	StaticFiles fs.FS
 }
 

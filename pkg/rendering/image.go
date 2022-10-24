@@ -3,7 +3,6 @@ package rendering
 import (
 	"errors"
 	"fmt"
-	"github.com/disintegration/imaging"
 	"github.com/fogleman/gg"
 	"image"
 	"image/color"
@@ -11,19 +10,15 @@ import (
 	"net/http"
 )
 
-func Resize(img image.Image) image.Image {
-	return imaging.Resize(img, 64, 64, imaging.Lanczos)
-}
-
-func FromURL(url string) (image.Image, error) {
+// ImageFromURL will create an image.Image from a URL
+func ImageFromURL(url string) (image.Image, error) {
 	//Get the response bytes from the url
 	response, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
+		if err = Body.Close(); err != nil {
 			fmt.Println("unable to close response")
 		}
 	}(response.Body)
@@ -35,6 +30,7 @@ func FromURL(url string) (image.Image, error) {
 	return img, err
 }
 
+// RenderText will render the given string to a 64x64 image.Image
 func RenderText(text string) image.Image {
 	dc := gg.NewContext(64, 64)
 	dc.DrawImage(&image.Uniform{C: color.Black}, 0, 0)

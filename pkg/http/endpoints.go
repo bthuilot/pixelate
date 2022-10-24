@@ -17,10 +17,15 @@ func (s Server) registerEndpoints(staticDir fs.FS) {
 			"status": "ok",
 		})
 	})
+
+	/* Static */
 	s.router.StaticFS("/static", http.FS(staticDir))
+
+	/* HTML Pages */
+	// Dashboard
 	s.router.GET("/", s.RenderDashboard)
 
-	// Agents //
+	/* Agents */
 	// All Agents
 	s.router.GET("/agents", s.ListAgents)
 	// Current Agent

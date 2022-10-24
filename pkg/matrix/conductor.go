@@ -125,6 +125,7 @@ func (c *conductor) rendererLoop(agent rendering.Agent, exitChan chan interface{
 	}
 }
 
+// render will draw the given image.Image to the display
 func (c *conductor) render(img image.Image) {
 	draw.Draw(c.display, c.display.Bounds(), img, image.Point{}, draw.Src)
 	if err := c.display.Render(); err != nil {
