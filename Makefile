@@ -14,7 +14,7 @@ STATIC_SOURCES = $(wildcard $(ASSEST_DIR)/web/static/*)
 FONTS = $(wildcard $(ASSEST_DIR)/fonts/*.ttf)
 
 rpi-lib:
-	$(MAKE) -C third_party/rpi-rgb-led-matrix/lib
+	$(MAKE) -C third_party/rpi-rgb-led-matrix/lib all
 
 pixelate: rpi-lib $(GO_SOURCES) $(TEMPLATE_SOURCES) $(STATIC_SOURCES) $(FONTS)
 	go build -o pixelate

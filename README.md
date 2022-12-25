@@ -20,7 +20,7 @@ To Install:
 ### Build from source
 
 1. Clone this repo onto the Raspberry Pi
-2. Initialize Git Submodules
+2. Initialize Git Submodules (`git submodule update --init --recursive`)
 3. run `make`
 4. Create the `config.yml`
 5. Run the binary
@@ -33,3 +33,4 @@ An "Agent" represents a service that will render to the display.
 The current list of "agent" values are
 
 - **Spotify**: Render the currently playing album to the board
+- 
