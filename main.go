@@ -81,6 +81,7 @@ func initEmbed() (err error) {
 		return fmt.Errorf("unable to trasverse fonts directory: %s", err)
 	}
 
+	// Static web content
 	staticDir := path.Join("assets", "web", "static")
 	if os.Getenv("USE_FS") != "" {
 		staticFiles = os.DirFS(staticDir)
@@ -88,6 +89,7 @@ func initEmbed() (err error) {
 		return fmt.Errorf("unable to trasverse static files directory: %s", err)
 	}
 
+	// Web Templates
 	templateDir := path.Join("assets", "web", "templates")
 	if os.Getenv("USE_FS") != "" {
 		templateFiles = os.DirFS(templateDir)

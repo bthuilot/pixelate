@@ -13,26 +13,21 @@ TEMPLATE_SOURCES = $(wildcard $(ASSEST_DIR)/web/templates/*.tmpl)
 STATIC_SOURCES = $(wildcard $(ASSEST_DIR)/web/static/*)
 FONTS = $(wildcard $(ASSEST_DIR)/fonts/*.ttf)
 
-rpi-lib:
-	$(MAKE) -C third_party/rpi-rgb-led-matrix/lib all
-
 pixelate: rpi-lib $(GO_SOURCES) $(TEMPLATE_SOURCES) $(STATIC_SOURCES) $(FONTS)
 	go build -o pixelate
 
-.PHONY: clean debug test install prod-vars release
+.PHONY: clean test install prod-vars release rpi-lib
+rpi-lib:
+	$(MAKE) -C third_party/rpi-rgb-led-matrix/lib all
+
 clean:
 	rm -f pixelate
-
-debug: export MATRIX_EMULATOR = 1
-
-debug:
-	go run main.go
 
 install: pixelate
 	cp pixelate /usr/local/bin/pixelate
 
 test:
-	cd src && go test
+	go test
 
 prod-vars:
 	export GIN_MODE=release

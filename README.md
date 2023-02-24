@@ -1,5 +1,8 @@
 # πxelate
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/bthuilot/pixelate)](https://goreportcard.com/report/github.com/bthuilot/pixelate)
+
+
 *Note*: This project was inspired by [@rwardtech](https://www.tiktok.com/@rwardtech) on TikTok and his SpotiPi project which can be view [here on GitHub](https://github.com/ryanwa18/spotipi).
 
 

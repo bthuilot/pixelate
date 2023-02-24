@@ -56,7 +56,7 @@ type currentAgent struct {
 	exitChan chan interface{}
 }
 
-// NewConductor will construct a conductor wit hthe given display service and list
+// NewConductor will construct a conductor with the given display service and list
 // of available renderers. Will fail if the IDs of the Renderers are not unique.
 func NewConductor(rndrs []rendering.Agent) (Conductor, error) {
 	rndrMap := map[string]rendering.Agent{}
