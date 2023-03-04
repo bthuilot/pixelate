@@ -131,7 +131,7 @@ func (s *Spotify) renderAlbumArt() (img image.Image, err error) {
 
 	if len(images) > 0 {
 		url := images[0].URL
-		img, err := ImageFromURL(url)
+		img, err = ImageFromURL(url)
 		return imaging.Resize(img, 64, 64, imaging.Lanczos), err
 	}
 	return nil, fmt.Errorf("no album art images returned from API")

@@ -63,7 +63,7 @@ func NewConductor(rndrs []rendering.Agent) (Conductor, error) {
 	for _, s := range rndrs {
 		name := s.GetName()
 		if _, e := rndrMap[name]; e {
-			return nil, fmt.Errorf("service names should be unique, recieved %s", name)
+			return nil, fmt.Errorf("service names should be unique, received %s", name)
 		}
 		rndrMap[name] = s
 	}
@@ -98,7 +98,7 @@ func (c *conductor) InitNewAgent(id rendering.ID) error {
 	logrus.Infof("starting rendering agent %s", id)
 	agent, exist := c.renderers[id]
 	if !exist {
-		return fmt.Errorf("initialize non existant service %s", id)
+		return fmt.Errorf("initialize non existent service %s", id)
 	}
 	_ = c.StopCurrentAgent() // ignore the error, just want to stop a service if one is running
 	exit := make(chan interface{})

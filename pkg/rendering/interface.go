@@ -15,7 +15,7 @@ type ID = string
 // of config keys to values
 type Config map[string]string
 
-// Agent represents a service taht will draw to the matrix
+// Agent represents a service that will draw to the matrix
 type Agent interface {
 	// GetName will return the ID for the
 	GetName() ID
