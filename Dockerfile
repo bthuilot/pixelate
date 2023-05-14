@@ -1,13 +1,4 @@
-# This Dockerfile serves as a X11 forwarder for running the
-# application on systems where the rpi-rgb-led-matrix library cannot be built
-FROM ubuntu:latest
-
-RUN apt-get update && apt-get install -y xauth xorg openbox curl make build-essential
-
-ENV PATH="$PATH:/usr/local/go/bin"
-ENV GO_VERSION="1.20.1"
-# Install Golang
-RUN curl -sL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar -xvz -C /usr/local
+FROM golang:1.20
 
 WORKDIR /app
 COPY main.go /app/
@@ -21,5 +12,8 @@ COPY third_party/ /app/third_party/
 
 RUN make release
 ENV MATRIX_EMULATOR=1
+ENV DISPLAY :0
 EXPOSE 6000
-ENTRYPOINT ["/app/pixelate"]
+
+# Start the Xorg server and run the application on container start
+CMD /app/pixelate
