@@ -14,7 +14,7 @@ STATIC_SOURCES = $(wildcard $(ASSEST_DIR)/web/static/*)
 FONTS = $(wildcard $(ASSEST_DIR)/fonts/*.ttf)
 
 pixelate: rpi-lib $(GO_SOURCES) $(TEMPLATE_SOURCES) $(STATIC_SOURCES) $(FONTS)
-	go build -o pixelate
+	go build -ldflags "-s -w" -o pixelate .
 
 .PHONY: clean test install prod-vars release rpi-lib
 rpi-lib:
@@ -28,8 +28,5 @@ install: pixelate
 
 test:
 	go test
-
-prod-vars:
-	export GIN_MODE=release
 
 release: clean prod-vars pixelate
