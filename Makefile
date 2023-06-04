@@ -1,11 +1,12 @@
 SOURCEDIR = pkg
 # Go Sources
 API_GO_SOURCES = $(wildcard $(SOURCEDIR)/api/*.go)
+CONFIG_GO_SOURCES = $(wildcard $(SOURCEDIR)/config/*.go)
 HTTP_GO_SOURCES = $(wildcard $(SOURCEDIR)/http/*.go)
 MATRIX_GO_SOURCES = $(wildcard $(SOURCEDIR)/matrix/*.go)
 RENDERING_GO_SOURCES = $(wildcard $(SOURCEDIR)/rendering/*.go)
 UTIL_GO_SOURCES = $(wildcard $(SOURCEDIR)/util/*.go)
-GO_SOURCES = $(API_GO_SOURCES) $(HTTP_GO_SOURCES) $(MATRIX_GO_SOURCES) $(RENDERING_GO_SOURCES) $(UTIL_GO_SOURCES)
+GO_SOURCES = $(API_GO_SOURCES) $(HTTP_GO_SOURCES) $(CONFIG_GO_SOURCES) $(MATRIX_GO_SOURCES) $(RENDERING_GO_SOURCES) $(UTIL_GO_SOURCES)
 
 ASSEST_DIR = assets
 # Embedded sources
@@ -25,6 +26,7 @@ clean:
 
 install:
 	cp pixelate /usr/local/bin/pixelate
+	cp config.yml /etc/pixelate/config.yml
 
 test:
 	go test

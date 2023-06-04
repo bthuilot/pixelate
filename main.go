@@ -5,19 +5,28 @@ package main
 import (
 	"embed"
 	"fmt"
-	"github.com/bthuilot/pixelate/pkg/http"
-	"github.com/bthuilot/pixelate/pkg/matrix"
-	"github.com/bthuilot/pixelate/pkg/rendering"
-	"github.com/bthuilot/pixelate/pkg/util"
-	"github.com/sirupsen/logrus"
 	"io/fs"
 	"os"
 	"path"
+
+	"github.com/bthuilot/pixelate/pkg/config"
+	"github.com/bthuilot/pixelate/pkg/http"
+	"github.com/bthuilot/pixelate/pkg/matrix"
+	"github.com/bthuilot/pixelate/pkg/rendering"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
+	var (
+		cfg config.ConfigFile
+		err error
+	)
 	// Load viper
-	if err := util.InitConfig(); err != nil {
+	if cfg, err = config.InitConfig(); err != nil {
+		logrus.Fatal(err)
+	}
+
+	if err := config.InitLogger(cfg.Logging.Level, cfg.Logging.LogFile, cfg.Logging.UseSTDOUT); err != nil {
 		logrus.Fatal(err)
 	}
 
@@ -25,10 +34,15 @@ func main() {
 	if err := initEmbed(); err != nil {
 		logrus.Fatal(err)
 	}
+
+	// Load Spotify
+
 	// Create services
 	logrus.Info("Creating renderers")
 	rndrs := []rendering.Agent{
-		rendering.NewSpotifyAgent(),
+		rendering.NewSpotifyAgent(
+			cfg.Spotify.ClientID, cfg.Spotify.ClientSecret, cfg.Server.URL,
+		),
 		rendering.NewTickerAgent(),
 	}
 	if err := rendering.LoadFonts(fonts); err != nil {
@@ -49,6 +63,7 @@ func main() {
 		Templates:   templateFiles,
 		StaticFiles: staticFiles,
 	})
+
 	if err = server.Run(); err != nil {
 		logrus.Fatal(err)
 	}
