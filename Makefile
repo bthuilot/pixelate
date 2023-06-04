@@ -23,7 +23,7 @@ rpi-lib:
 clean:
 	rm -f pixelate
 
-install: pixelate
+install:
 	cp pixelate /usr/local/bin/pixelate
 
 test:
