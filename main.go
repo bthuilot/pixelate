@@ -5,13 +5,14 @@ package main
 import (
 	"embed"
 	"fmt"
+	"io/fs"
+	"os"
+	"path"
+
 	"github.com/bthuilot/pixelate/pkg/api"
 	"github.com/bthuilot/pixelate/pkg/display"
 	"github.com/bthuilot/pixelate/pkg/display/screens"
 	"github.com/bthuilot/pixelate/third_party/rgbmatrix"
-	"io/fs"
-	"os"
-	"path"
 
 	"github.com/bthuilot/pixelate/pkg/config"
 	"github.com/bthuilot/pixelate/pkg/rendering"
@@ -54,6 +55,7 @@ func main() {
 	s := []display.Screen{
 		// Load Spotify
 		screens.NewSpotifyScreen(cfg),
+		screens.NewWifiQRCode(cfg),
 	}
 
 	// Create services

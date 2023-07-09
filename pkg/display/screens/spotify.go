@@ -3,6 +3,11 @@ package screens
 import (
 	"context"
 	"fmt"
+	"image"
+	"math/rand"
+	"net/http"
+	"time"
+
 	"github.com/bthuilot/pixelate/pkg/config"
 	"github.com/bthuilot/pixelate/pkg/display"
 	"github.com/bthuilot/pixelate/pkg/rendering"
@@ -10,10 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
-	"image"
-	"math/rand"
-	"net/http"
-	"time"
 )
 
 type Spotify struct {
@@ -21,24 +22,25 @@ type Spotify struct {
 	client        *spotify.Client
 }
 
-func (s Spotify) Render() (img image.Image, dur time.Duration, err error) {
+func (s *Spotify) Render() (img image.Image, dur time.Duration, err error) {
 	dur = time.Second * 15
 	if s.client == nil {
 		img = rendering.RenderText("go to homepage to login")
+		return
 	}
 	img, err = s.renderAlbumArt()
 	return
 }
 
-func (s Spotify) GetConfig() map[string]string {
+func (s *Spotify) GetConfig() map[string]string {
 	return nil
 }
 
-func (s Spotify) UpdateConfig(m map[string]string) error {
+func (s *Spotify) UpdateConfig(m map[string]string) error {
 	return nil
 }
 
-func (s Spotify) GetHTMLPage() (attrs []display.HTMLAttributes) {
+func (s *Spotify) GetHTMLPage() (attrs []display.HTMLAttribute) {
 	attrs = append(attrs, display.HTMLLink{
 		Text: "Login with Spotify",
 		Href: s.authenticator.AuthURL(state),
@@ -57,13 +59,13 @@ func (s Spotify) GetHTMLPage() (attrs []display.HTMLAttributes) {
 	return
 }
 
-func (s Spotify) Init(r *gin.RouterGroup) (name string, err error) {
+func (s *Spotify) Init(r *gin.RouterGroup) (name string, err error) {
 	name = "Spotify"
-	r.GET("/screens/spotify/callback", s.authCallback)
+	r.GET("/spotify/callback", s.authCallback)
 	return
 }
 
-func (s Spotify) authCallback(c *gin.Context) {
+func (s *Spotify) authCallback(c *gin.Context) {
 	tok, err := s.authenticator.Token(c.Request.Context(), state, c.Request)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{
@@ -85,7 +87,7 @@ func (s Spotify) authCallback(c *gin.Context) {
 
 var state = fmt.Sprintf("%d", rand.New(rand.NewSource(time.Now().UnixNano())).Int63())
 
-func (s Spotify) renderAlbumArt() (img image.Image, err error) {
+func (s *Spotify) renderAlbumArt() (img image.Image, err error) {
 	if s.client == nil {
 		return rendering.RenderText("please sign in on homepage"), nil
 	}
@@ -108,9 +110,9 @@ func (s Spotify) renderAlbumArt() (img image.Image, err error) {
 }
 
 func NewSpotifyScreen(cfg config.ConfigFile) display.Screen {
-	return Spotify{
+	return &Spotify{
 		authenticator: spotifyauth.New(
-			spotifyauth.WithRedirectURL(fmt.Sprintf("%s/api/spotify/callback", cfg.Server.ExternalURL)),
+			spotifyauth.WithRedirectURL(fmt.Sprintf("%s/spotify/callback", cfg.Server.ExternalURL)),
 			spotifyauth.WithScopes(
 				spotifyauth.ScopeUserReadCurrentlyPlaying,
 				spotifyauth.ScopeUserReadPlaybackState,

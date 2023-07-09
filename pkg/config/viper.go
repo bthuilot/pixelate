@@ -26,10 +26,17 @@ type SpotifyConfig struct {
 	ClientSecret string `mapstructure:"clientSecret"`
 }
 
+type WifiQRConfig struct {
+	SSID     string `mapstructure:"ssid"`
+	AuthType string `mapstructure:"authType"`
+	Password string `mapstructure:"password"`
+}
+
 type ConfigFile struct {
-	Server  ServerConfig  `mapstructure:"server"`
-	Spotify SpotifyConfig `mapstructure:"spotify"`
-	Logging LogConfig     `mapstrucutre:"logging"`
+	Server     ServerConfig  `mapstructure:"server"`
+	Spotify    SpotifyConfig `mapstructure:"spotify"`
+	WifiQRCode WifiQRConfig  `mapstructure:"wifi_qrcode"`
+	Logging    LogConfig     `mapstrucutre:"logging"`
 }
 
 type LogConfig struct {

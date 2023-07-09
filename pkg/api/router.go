@@ -1,13 +1,14 @@
 package api
 
 import (
+	"html/template"
+	"io/fs"
+	"net/http"
+
 	"github.com/bthuilot/pixelate/pkg/api/routes"
 	"github.com/bthuilot/pixelate/pkg/display"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"html/template"
-	"io/fs"
-	"net/http"
 )
 
 func NewRouter(templateFS fs.FS, staticFS fs.FS) *gin.Engine {
@@ -27,12 +28,10 @@ func RegisterRoutes(r *gin.Engine, d display.Display) {
 	/* HTML Pages */
 	// Dashboard
 	r.GET("/", routes.RenderDashboard(d))
-	/* Agents */
-	// All Agents
-	//s.router.GET("/screens", s.ListAgents)
-	// Current Agent
-	//s.router.GET("/agents/current", s.GetCurrentAgent)
+	/* Screen */
+	// Clear the screen
 	r.DELETE("/screens/current", routes.ClearScreen(d))
+	// Set the current screen
 	r.POST("/screens/current", routes.SetScreen(d))
 	// Config
 	r.POST("/screens/current/config", routes.UpdateScreenConfig(d))
