@@ -2,6 +2,7 @@ package rendering
 
 import (
 	"fmt"
+	"github.com/bthuilot/pixelate/pkg/alphavantage"
 	"github.com/gin-gonic/gin"
 	"image"
 	"image/color"
