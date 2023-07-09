@@ -6,6 +6,14 @@
 *Note*: This project was inspired by [@rwardtech](https://www.tiktok.com/@rwardtech) on TikTok and his SpotiPi project which can be view [here on GitHub](https://github.com/ryanwa18/spotipi).
 
 
+## Examples
+
+ |                      Pink Floyd - Dark side of the Moon                       |                        Tame Impala - Currents                         |                      Daft Punk - Alive (2007)                      |
+|:-----------------------------------------------------------------------------:|:---------------------------------------------------------------------:|:------------------------------------------------------------------:|
+ | ![Pink floyd - dark side of the moon](assets/img/readme/pink-floyd-dsotm.jpg) | ![Tame Impala - Currents](assets/img/readme/tame-impala-currents.jpg) | ![Daft Punk - Alive (2007)](assets/img/readme/daft-punk-alive.jpg) |
+
+
+
 ## Hardware Needed
 
 1. [Raspberry Pi](https://www.raspberrypi.com/products/) & SD Card with Raspbian installed
@@ -22,12 +30,19 @@ To Install:
 
 ### Build from source
 
-1. Clone this repo onto the Raspberry Pi
-2. Initialize Git Submodules (`git submodule update --init --recursive`)
-3. run `make`
-4. Create the `config.yml`
-5. Run the binary
+```bash
+# Clone the repo
+git clone --recurse-submodules github.com/bthuilot/pixelate
+cd pixelate
+# Build project and dependencies
+make
 
+cp example.config.yml config.yml
+# Edit the config.yml ...
+sudo make install
+
+/usr/local/bin/pixlate
+```
 
 ## Supported screens
 
