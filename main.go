@@ -5,57 +5,86 @@ package main
 import (
 	"embed"
 	"fmt"
-	"github.com/bthuilot/pixelate/pkg/http"
-	"github.com/bthuilot/pixelate/pkg/matrix"
-	"github.com/bthuilot/pixelate/pkg/rendering"
-	"github.com/bthuilot/pixelate/pkg/util"
-	"github.com/sirupsen/logrus"
 	"io/fs"
 	"os"
 	"path"
+
+	"github.com/bthuilot/pixelate/pkg/api"
+	"github.com/bthuilot/pixelate/pkg/display"
+	"github.com/bthuilot/pixelate/pkg/display/screens"
+	"github.com/bthuilot/pixelate/third_party/rgbmatrix"
+
+	"github.com/bthuilot/pixelate/pkg/config"
+	"github.com/bthuilot/pixelate/pkg/rendering"
+	"github.com/sirupsen/logrus"
 )
 
+// newDisplayCanvas creates a new canvas that renders to the matrix display
+func newDisplayCanvas() (*rgbmatrix.Canvas, error) {
+	config := &rgbmatrix.DefaultConfig
+	config.Cols = 64
+	config.Rows = 64
+	config.HardwareMapping = "adafruit-hat"
+	config.Brightness = 50
+	// create a new Matrix instance with the DefaultConfig
+	matrix, err := rgbmatrix.NewRGBLedMatrix(config)
+	return rgbmatrix.NewCanvas(matrix), err
+}
+
 func main() {
+	var (
+		cfg    config.ConfigFile
+		err    error
+		canvas *rgbmatrix.Canvas
+	)
 	// Load viper
-	if err := util.InitConfig(); err != nil {
+	if cfg, err = config.InitConfig(); err != nil {
+		logrus.Fatal(err)
+	}
+
+	if err = config.InitLogger(cfg.Logging.Level, cfg.Logging.LogFile, cfg.Logging.UseSTDOUT); err != nil {
 		logrus.Fatal(err)
 	}
 
 	// Load Embedded Files
-	if err := initEmbed(); err != nil {
+	if err = initEmbed(); err != nil {
 		logrus.Fatal(err)
 	}
-	// Create services
-	logrus.Info("Creating renderers")
-	rndrs := []rendering.Agent{
-		rendering.NewSpotifyAgent(),
-		rendering.NewTickerAgent(),
+
+	logrus.Info("creating screens")
+	s := []display.Screen{
+		// Load Spotify
+		screens.NewSpotifyScreen(cfg),
+		screens.NewWifiQRCode(cfg),
 	}
-	if err := rendering.LoadFonts(fonts); err != nil {
+
+	// Create services
+	if err = rendering.LoadFonts(fonts); err != nil {
 		logrus.Fatal(err)
 	}
 
 	logrus.Info("Launching matrix service")
-	// Create the conductor
-	logrus.Info("Creating conductor")
-	cndtr, err := matrix.NewConductor(rndrs)
+	if canvas, err = newDisplayCanvas(); err != nil {
+		logrus.Fatal(err)
+	}
+
+	r := api.NewRouter(templateFiles, staticFiles)
+
+	// Add custom routes
+	logrus.Info("constructing display")
+	d := display.NewDisplay(r.Group("/"), canvas, s)
 	if err != nil {
 		logrus.Fatal(err)
 	}
 
-	// Create and start webserver
+	api.RegisterRoutes(r, d)
+
+	// start webserver
 	logrus.Info("Starting HTTP Server")
-	server := http.NewServer(cndtr, http.Options{
-		Templates:   templateFiles,
-		StaticFiles: staticFiles,
-	})
-	if err = server.Run(); err != nil {
+	if err = r.Run(); err != nil {
 		logrus.Fatal(err)
 	}
-	logrus.Info("Server exited, shutting down agents")
-	if err = cndtr.StopCurrentAgent(); err != nil {
-		logrus.Fatal(err)
-	}
+	logrus.Info("server exited")
 }
 
 /* Embedded files */

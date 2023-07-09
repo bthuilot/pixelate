@@ -1,4 +1,4 @@
-package http
+package responses
 
 // ValidResponse represents a 200 success response
 type ValidResponse[T interface{}] struct {

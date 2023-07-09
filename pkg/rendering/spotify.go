@@ -3,21 +3,23 @@ package rendering
 import (
 	"context"
 	"fmt"
-	"github.com/disintegration/imaging"
 	"image"
 	"math/rand"
 	"net/http"
 	"time"
 
-	"github.com/bthuilot/pixelate/pkg/util"
+	"github.com/disintegration/imaging"
+
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"github.com/zmb3/spotify/v2"
 
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 )
 
 type Spotify struct {
+	clientID      string
+	clientSecret  string
+	serverURL     string
 	authenticator *spotifyauth.Authenticator
 	client        *spotify.Client
 	cfg           Config
@@ -30,13 +32,13 @@ func (s *Spotify) SetConfig(config Config) error {
 
 func (s *Spotify) RegisterEndpoints(r *gin.Engine) {
 	s.authenticator = spotifyauth.New(
-		spotifyauth.WithRedirectURL(fmt.Sprintf("http://%s/spotify/callback", viper.GetString(util.ServerURL))),
+		spotifyauth.WithRedirectURL(fmt.Sprintf("http://%s/spotify/callback", s.serverURL)),
 		spotifyauth.WithScopes(
 			spotifyauth.ScopeUserReadCurrentlyPlaying,
 			spotifyauth.ScopeUserReadPlaybackState,
 			spotifyauth.ScopeUserReadEmail),
-		spotifyauth.WithClientID(viper.GetString(util.SpotifyClientID)),
-		spotifyauth.WithClientSecret(viper.GetString(util.SpotifyClientSecret)),
+		spotifyauth.WithClientID(s.clientID),
+		spotifyauth.WithClientSecret(s.clientSecret),
 	)
 	r.GET("/spotify/callback", s.authCallback)
 }
@@ -101,7 +103,7 @@ func (s *Spotify) NextFrame() (img image.Image) {
 	}
 }
 
-func NewSpotifyAgent() Agent {
+func NewSpotifyAgent(clientID, clientSecret, serverURL string) Agent {
 	return &Spotify{
 		authenticator: nil,
 		client:        nil,

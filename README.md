@@ -8,10 +8,10 @@
 
 ## Hardware Needed
 
-1. Raspberry Pi & SD Card with Raspbian
-2. 64x64 RGB Matrix
-3. Adafruit Matrix Bonnet Hat
-4. 10V A/C Adapter
+1. [Raspberry Pi](https://www.raspberrypi.com/products/) & SD Card with Raspbian installed
+2. [64x64 RGB Matrix](https://www.adafruit.com/product/3649)
+3. [Adafruit Matrix Bonnet Hat](https://www.adafruit.com/product/3211)
+4. [5V 10A A/C Adapter](https://www.adafruit.com/product/658)
 
 ## Up and Running
 
@@ -29,11 +29,11 @@ To Install:
 5. Run the binary
 
 
-## Supported agents
+## Supported screens
 
-An "Agent" represents a service that will render to the display.
+A "Screen" represents a service that will render to the display.
 
-The current list of "agent" values are
+The current list of "screen" values are:
 
 - **Spotify**: Render the currently playing album to the board
-- 
+- **Wifi QR Code**: Render a QR code to join a wifi network

@@ -15,5 +15,4 @@ ENV MATRIX_EMULATOR=1
 ENV DISPLAY :0
 EXPOSE 6000
 
-# Start the Xorg server and run the application on container start
 CMD /app/pixelate

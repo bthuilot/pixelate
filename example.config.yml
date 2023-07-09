@@ -1,3 +1,22 @@
-spotify_client_id: clientid
-spotify_client_secret: secret
-server_url: "localhost:8080"
+alphaVantage:
+  apiKey: [YOUR ALPHA VANTAGE API KEY HERE]
+
+logging:
+  level: DEBUG
+  # `useStdout` takes presedence over
+  # `file`
+  useStdout: true
+  file: /var/log/pixelate/server.log
+
+
+spotify:
+  clientID: [YOUR CLIENT ID HERE]
+  clientSecret: [YOUR CLIENT SECRET HERE]
+
+mta:
+  apiKey:  [YOUR CLIENT MTA API KEY HERE]
+
+server:
+  port: 8080
+  host: localhost
+  externalURL: http://my.site.url/
