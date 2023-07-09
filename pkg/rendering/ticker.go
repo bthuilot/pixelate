@@ -2,7 +2,6 @@ package rendering
 
 import (
 	"fmt"
-	"github.com/bthuilot/pixelate/pkg/api"
 	"github.com/gin-gonic/gin"
 	"image"
 	"image/color"
@@ -54,7 +53,7 @@ func (t *Ticker) NextFrame() image.Image {
 	if ticker, exist = t.config[tickerSymbolConfigName]; !exist {
 		return RenderText("Please set a ticker")
 	}
-	res, err := api.GetStockInfo(ticker)
+	res, err := alphavantage.GetStockInfo(ticker)
 	if err != nil {
 		return RenderText("API Error")
 	}

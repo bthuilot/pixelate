@@ -1,11 +1,13 @@
 package http
 
 import (
+	"github.com/bthuilot/pixelate/pkg/display"
 	"github.com/bthuilot/pixelate/pkg/matrix"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"html/template"
 	"io/fs"
+	"time"
 )
 
 // Server is an HTTP server for providing an API for controlling the matrix
@@ -13,7 +15,9 @@ type Server struct {
 	// cndtr is the matrix.Conductor for interfacing with agents and the display
 	cndtr matrix.Conductor
 	// router is the HTTP router
-	router *gin.Engine
+	router   *gin.Engine
+	t        time.Timer
+	renderer display.Screen
 }
 
 // Options are options to provide

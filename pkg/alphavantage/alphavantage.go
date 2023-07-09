@@ -1,4 +1,4 @@
-package api
+package alphavantage
 
 import (
 	"github.com/bthuilot/pixelate/pkg/util"

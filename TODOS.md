@@ -1,0 +1,3 @@
+- use `env` in config
+- make config into sections
+- rework logic

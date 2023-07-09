@@ -20,8 +20,8 @@ document.addEventListener('submit', (e) => {
 
 console.log("hey!");
 
-function stopAgent() {
-    fetch("/agents/current", {
+function clearScreen() {
+    fetch("/screens/current", {
         method: "DELETE"
     }).then(() => window.location.href=window.location.href).catch(err => console.log(err));
 }

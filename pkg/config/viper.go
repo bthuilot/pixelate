@@ -16,8 +16,9 @@ const (
 )
 
 type ServerConfig struct {
-	Port int
-	URL  string
+	Port        int
+	Host        string
+	ExternalURL string
 }
 
 type SpotifyConfig struct {
