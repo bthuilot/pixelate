@@ -12,7 +12,7 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/zmb3/spotify/v2 v2.3.1
 	golang.org/x/exp/shiny v0.0.0-20230425010034-47ecfdc1ba53
-	golang.org/x/image v0.7.0
+	golang.org/x/image v0.10.0
 	golang.org/x/mobile v0.0.0-20230427221453-e8d11dd0ba41
 )
 
