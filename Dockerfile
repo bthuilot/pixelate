@@ -1,4 +1,4 @@
-FROM golang:1.20
+FROM golang:1.21-bookworm
 
 WORKDIR /app
 COPY main.go /app/
